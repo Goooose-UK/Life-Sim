@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Life Sim — Tiny Life Simulator</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #fff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e5eaf0;
+      --green: #16a36a;
+      --green-dark: #08784b;
+      --red: #dc4455;
+      --blue: #2878d0;
+      --gold: #f1ad30;
+      --shadow: 0 10px 28px #17203310;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .12s, filter .12s;
+    }
+    button:hover { filter: brightness(.96); transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .primary { background: var(--green); color: white; }
+    .secondary { background: #eaf5ef; color: var(--green-dark); }
+    .danger { background: #fff0f1; color: #b72d3b; }
+    .dark { background: #28344a; color: white; }
+    .small { padding: 7px 10px; font-size: 13px; }
+    .app { max-width: 1120px; margin: auto; padding: 22px 16px 50px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      display: grid; place-items: center; width: 42px; height: 42px;
+      border-radius: 13px; background: var(--green); color: white; font-size: 23px;
+    }
+    h1 { font-size: 22px; margin: 0; }
+    .tagline { color: var(--muted); font-size: 13px; }
+    .header-actions { display: flex; gap: 8px; }
+    .grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 16px; box-shadow: var(--shadow); padding: 18px;
+    }
+    .profile { position: sticky; top: 14px; align-self: start; }
+    .profile-top { display: flex; align-items: center; gap: 13px; }
+    .avatar {
+      display: grid; place-items: center; width: 65px; height: 65px;
+      border-radius: 18px; font-size: 38px; background: #e5f5ec;
+    }
+    .name { font-size: 20px; font-weight: 800; }
+    .sub { color: var(--muted); font-size: 13px; }
+    .section-title {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: 18px 0 10px; font-weight: 800;
+    }
+    .meter { margin: 12px 0; }
+    .meter-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+    .track { height: 9px; border-radius: 99px; background: #edf0f4; overflow: hidden; }
+    .fill { height: 100%; border-radius: inherit; transition: width .25s; }
+    .green { background: #28b779; }
+    .blue { background: #4a91e8; }
+    .pink { background: #e97191; }
+    .orange { background: #efaa37; }
+    .money {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 14px; padding: 12px; background: #f7faf8; border-radius: 11px;
+    }
+    .money strong { font-size: 19px; }
+    .tabs { display: flex; gap: 7px; overflow: auto; margin: 0 0 12px; }
+    .tab {
+      background: #e9edf3; color: #596579; padding: 8px 12px;
+      white-space: nowrap; border-radius: 9px;
+    }
+    .tab.active { background: #dff3e8; color: var(--green-dark); }
+    .main-card { min-height: 610px; }
+    .actions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
+    .action {
+      text-align: left; background: #f5f8fb; color: var(--ink);
+      border: 1px solid var(--line); min-height: 56px;
+    }
+    .action span { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+    .feed { display: flex; flex-direction: column; gap: 9px; }
+    .event {
+      display: grid; grid-template-columns: 30px 1fr; gap: 9px;
+      padding: 11px 12px; border: 1px solid var(--line);
+      border-radius: 11px; background: #fff;
+    }
+    .event-icon { font-size: 20px; }
+    .event small { color: var(--muted); display: block; margin-top: 2px; }
+    .pill {
+      display: inline-block; border-radius: 100px; padding: 3px 8px;
+      font-size: 12px; background: #edf2f7; color: #526075;
+    }
+    .list { display: flex; flex-direction: column; gap: 9px; }
+    .list-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; border: 1px solid var(--line); border-radius: 11px; padding: 12px;
+    }
+    .person { display: flex; align-items: center; gap: 9px; }
+    .person-icon { font-size: 25px; }
+    .row-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+    .notice {
+      padding: 12px; background: #fff8e9; border: 1px solid #f4dfb1;
+      border-radius: 11px; margin: 10px 0;
+    }
+    .modal-backdrop {
+      position: fixed; inset: 0; display: grid; place-items: center;
+      background: #10182888; padding: 16px; z-index: 5;
+    }
+    .modal {
+      width: min(460px, 100%); background: white; padding: 22px;
+      border-radius: 17px; box-shadow: 0 22px 80px #10182855;
+    }
+    .modal h2 { margin: 0 0 8px; }
+    .modal p { color: var(--muted); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 12px 0; }
+    label { font-weight: 700; font-size: 13px; }
+    input, select {
+      width: 100%; padding: 10px; border: 1px solid var(--line);
+      border-radius: 9px; margin-top: 5px; background: white;
+    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .empty { text-align: center; padding: 26px 12px; color: var(--muted); }
+    .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 18px 0 0; }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .profile { position: static; }
+      .main-card { min-height: 450px; }
+    }
+    @media (max-width: 420px) {
+      .app { padding: 14px 10px 35px; }
+      .card { padding: 14px; }
+      .actions { grid-template-columns: 1fr 1fr; }
+      .header-actions button { padding: 8px 9px; }
+      h1 { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">🌱</div>
+      <div><h1>Life Sim</h1><div class="tagline">A tiny life, entirely your choices.</div></div>
+    </div>
+    <div class="header-actions">
+      <button class="secondary small" id="saveBtn">Save</button>
+      <button class="danger small" id="newBtn">New life</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="card profile" id="profile"></aside>
+    <main class="card main-card">
+      <nav class="tabs" id="tabs"></nav>
+      <div id="content"></div>
+    </main>
+  </div>
+  <div class="footer">An original life-simulation game inspired by the genre. Your progress is saved in this browser.</div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const SAVE_KEY = "tiny-life-simulator-save-v1";
+  const $ = (selector) => document.querySelector(selector);
+  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
+  const escapeHTML = (s) => String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+
+  const firstNames = {
+    Female: ["Ava", "Mia", "Sofia", "Amara", "Nina", "Lena", "Isla", "Zoe"],
+    Male: ["Leo", "Noah", "Ethan", "Jay", "Theo", "Kai", "Omar", "Sam"],
+    Nonbinary: ["Alex", "River", "Robin", "Sage", "Ari", "Charlie", "Sky", "Morgan"]
+  };
+  const lastNames = ["Brooks", "Rivera", "Kim", "Patel", "Morgan", "Bennett", "Okafor", "Reed"];
+  const countries = ["United States", "Canada", "United Kingdom", "Australia", "India", "Japan", "Brazil", "France"];
+  const jobs = [
+    { title: "Retail Associate", pay: 24000, education: 16 },
+    { title: "Barista", pay: 26000, education: 16 },
+    { title: "Office Assistant", pay: 33000, education: 18 },
+    { title: "Teacher", pay: 52000, education: 21 },
+    { title: "Nurse", pay: 68000, education: 21 },
+    { title: "Software Developer", pay: 90000, education: 21 },
+    { title: "Engineer", pay: 88000, education: 21 },
+    { title: "Lawyer", pay: 125000, education: 24 },
+    { title: "Doctor", pay: 155000, education: 25 },
+    { title: "Chef", pay: 48000, education: 18 },
+    { title: "Artist", pay: 38000, education: 18 },
+    { title: "Athlete", pay: 76000, education: 18 }
+  ];
+  const tabs = ["Life", "Activities", "School & Work", "Relationships", "Assets", "Achievements"];
+  let currentTab = "Life";
+  let game = null;
+
+  function newGame(data = {}) {
+    const gender = data.gender || pick(["Female", "Male", "Nonbinary"]);
+    const name = data.name || `${pick(firstNames[gender])} ${pick(lastNames)}`;
+    return {
+      name, gender, country: data.country || pick(countries), age: 0,
+      health: 90, happiness: 75, smarts: rand(35, 85), looks: rand(35, 85),
+      money: 0, income: 0, education: 0, school: "Toddler",
+      job: null, partner: null, children: [], friends: [],
+      house: null, car: null, alive: true, arrested: false,
+      prisonYears: 0, criminalRecord: false, relationships: [],
+      achievements: [], history: [], year: 1,
+      ...(data || {})
+    };
+  }
+
+  function addEvent(icon, text, details = "") {
+    game.history.unshift({ icon, text, details, age: game.age });
+    game.history = game.history.slice(0, 100);
+  }
+
+  function save(silent = false) {
+    if (!game) return;
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(game));
+      if (!silent) toast("Game saved on this device.");
+    } catch {
+      if (!silent) toast("Could not save. Check browser storage settings.");
+    }
+  }
+
+  function load() {
+    try {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.age === "number") return parsed;
+      }
+    } catch {}
+    return null;
+  }
+
+  function toast(message) {
+    const old = $("#toast");
+    if (old) old.remove();
+    const el = document.createElement("div");
+    el.id = "toast";
+    el.textContent = message;
+    Object.assign(el.style, {
+      position: "fixed", bottom: "20px", left: "50%", transform: "translateX(-50%)",
+      background: "#243044", color: "white", padding: "11px 16px",
+      borderRadius: "10px", zIndex: "10", boxShadow: "0 8px 30px #0003"
+    });
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
+  }
+
+  function bar(label, value, color) {
+    return `<div class="meter">
+      <div class="meter-label"><span>${label}</span><strong>${clamp(value)}%</strong></div>
+      <div class="track"><div class="fill ${color}" style="width:${clamp(value)}%"></div></div>
+    </div>`;
+  }
+
+  function money(value) {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  }
+
+  function renderProfile() {
+    const ageLabel = game.alive ? `${game.age} years old` : `Died at age ${game.age}`;
+    $("#profile").innerHTML = `
+      <div class="profile-top">
+        <div class="avatar">${game.alive ? (game.gender === "Female" ? "👩" : game.gender === "Male" ? "👨" : "🧑") : "🪦"}</div>
+        <div><div class="name">${escapeHTML(game.name)}</div>
+          <div class="sub">${ageLabel} · ${escapeHTML(game.country)}</div>
+          <div class="sub">${escapeHTML(game.school || "No school")}</div>
+        </div>
+      </div>
+      <div class="section-title">Your stats <span class="pill">${game.alive ? "Alive" : "Life complete"}</span></div>
+      ${bar("Health", game.health, "green")}
+      ${bar("Happiness", game.happiness, "orange")}
+      ${bar("Smarts", game.smarts, "blue")}
+      ${bar("Looks", game.looks, "pink")}
+      <div class="money"><div><div class="sub">Bank balance</div><strong>${money(game.money)}</strong></div>
+        <span>💵</span></div>
+      <div class="sub" style="margin-top:10px">Yearly income: ${money(game.income || 0)}</div>
+      ${game.partner ? `<div class="sub" style="margin-top:8px">❤️ Partner: ${escapeHTML(game.partner.name)}</div>` : ""}
+      ${game.job ? `<div class="sub" style="margin-top:4px">💼 ${escapeHTML(game.job.title)}</div>` : ""}
+      ${game.arrested ? `<div class="notice">🚔 You are in prison for ${game.prisonYears} more year(s).</div>` : ""}
+    `;
+  }
+
+  function renderTabs() {
+    $("#tabs").innerHTML = tabs.map(t =>
+      `<button class="tab ${currentTab === t ? "active" : ""}" data-tab="${t}">${t}</button>`
+    ).join("");
+    $("#tabs").querySelectorAll("[data-tab]").forEach(btn => btn.onclick = () => {
+      currentTab = btn.dataset.tab;
+      render();
+    });
+  }
+
+  function actionButton(title, description, action, disabled = false) {
+    return `<button class="action" data-action="${action}" ${disabled ? "disabled" : ""}>
+      ${title}<span>${description}</span></button>`;
+  }
+
+  function renderLife() {
+    const recent = game.history.slice(0, 16);
+    return `
+      <div class="section-title">Life events <span class="sub">Year ${game.year}</span></div>
+      ${!game.alive ? `<div class="notice"><strong>Your story has ended.</strong><br>
+        You lived to ${game.age}, earned ${money(game.money)}, and collected ${game.achievements.length} achievement(s).</div>
+        <button class="primary" data-action="restart">Begin a new life</button>` :
+        `<div class="actions" style="margin-bottom:18px">
+          ${actionButton("🎂 Age up", "Live through another year", "age", false)}
+          ${actionButton("📝 Write a journal", "Reflect and feel a little better", "journal", game.age < 6)}
+        </div>`}
+      <div class="feed">${recent.length ? recent.map(e => `
+        <div class="event"><div class="event-icon">${e.icon}</div>
+          <div><strong>${escapeHTML(e.text)}</strong><small>Age ${e.age}${e.details ? " · " + escapeHTML(e.details) : ""}</small></div>
+        </div>`).join("") : `<div class="empty">Your life story starts here. Choose an activity or age up!</div>`}
+      </div>`;
+  }
+
+  function renderActivities() {
+    return `<div class="section-title">Activities <span class="sub">Make this year count</span></div>
+      <div class="actions">
+        ${actionButton("🏃 Exercise", "Improve health and fitness", "exercise", game.age < 6)}
+        ${actionButton("📚 Read a book", "Boost your smarts", "read", game.age < 4)}
+        ${actionButton("🧘 Meditate", "Improve happiness", "meditate", game.age < 8)}
+        ${actionButton("🎨 Take an art class", "Have fun and grow your skills", "art", game.age < 8)}
+        ${actionButton("🎉 Go out", "Have a good time (costs $100)", "party", game.age < 16 || game.money < 100)}
+        ${actionButton("🩺 Visit a doctor", "Pay $500 for a health check", "doctor", game.money < 500)}
+        ${actionButton("💼 Volunteer", "Help your community", "volunteer", game.age < 16)}
+        ${actionButton("🎲 Try your luck", "A risky choice with random results", "luck", game.age < 18)}
+      </div>
+      <div class="notice">Activities are unlimited. Try several, then age up to see what life brings.</div>`;
+  }
+
+  function renderSchoolWork() {
+    const canStudy = game.age >= 18 && !game.job && game.education < 24;
+    const available = jobs.filter(j => game.age >= j.education && game.education >= j.education);
+    return `<div class="section-title">School & work</div>
+      <div class="notice"><strong>Education:</strong> ${game.education ? `${game.education} years completed` : "No qualifications"}
+        · <strong>Status:</strong> ${escapeHTML(game.school || "Not enrolled")}</div>
+      ${game.job ? `<div class="list-row"><div><strong>${escapeHTML(game.job.title)}</strong>
+        <div class="sub">${money(game.job.pay)} per year</div></div>
+        <button class="danger small" data-action="quit">Quit job</button></div>` :
+        `<div class="section-title">Find work</div>
+        <div class="list">${available.length ? available.map((j, i) => `
+          <div class="list-row"><div><strong>${escapeHTML(j.title)}</strong>
+          <div class="sub">${money(j.pay)}/year · needs age ${j.education}+</div></div>
+          <button class="primary small" data-action="job:${i}">Apply</button></div>`).join("") :
+          `<div class="empty">No jobs available yet. Finish school and grow up!</div>`}</div>`}
+      ${canStudy ? `<div class="section-title">Higher education</div><div class="actions">
+        ${actionButton("🎓 Community college", "Study for 2 years · costs $2,000/year", "college")}
+        ${actionButton("🏛️ University", "Study for 4 years · costs $8,000/year", "university")}
+      </div>` : ""}
+      ${game.age >= 60 && game.job ? `<button style="margin-top:12px" class="secondary" data-action="retire">Retire</button>` : ""}
+      <p class="sub">Jobs and education unlock as your character gets older. Promotions and salary changes may happen over time.</p>`;
+  }
+
+  function renderRelationships() {
+    const partner = game.partner;
+    return `<div class="section-title">Relationships <span class="sub">${game.children.length} child(ren)</span></div>
+      ${partner ? `<div class="list-row"><div class="person"><span class="person-icon">💞</span><div>
+        <strong>${escapeHTML(partner.name)}</strong><div class="sub">${escapeHTML(partner.status)} · relationship ${partner.quality}%</div>
+        </div></div><div class="row-buttons">
+        <button class="secondary small" data-action="date">Go on a date</button>
+        <button class="secondary small" data-action="propose">Propose</button>
+        <button class="danger small" data-action="breakup">Break up</button>
+      </div></div>` : `<div class="notice">You're single. Meet someone when you're ready.</div>
+        <button class="primary" data-action="date">💌 Meet someone</button>`}
+      ${game.age >= 18 && game.children.length < 6 ? `<button class="secondary" style="margin:10px 0" data-action="child">👶 Try for a child</button>` : ""}
+      <div class="section-title">Children</div>
+      ${game.children.length ? `<div class="list">${game.children.map(c => `
+        <div class="list-row"><div class="person"><span class="person-icon">🧒</span>
+        <div><strong>${escapeHTML(c.name)}</strong><div class="sub">Age ${c.age}</div></div></div>
+        <span class="pill">${c.age >= 18 ? "Adult" : "Growing up"}</span></div>`).join("")}</div>` :
+        `<div class="empty">No children yet.</div>`}
+      <div class="section-title">Friends</div>
+      <div class="sub">${game.friends.length ? game.friends.map(escapeHTML).join(", ") : "Spend time with people to make friends."}</div>
+      <button class="secondary" style="margin-top:10px" data-action="friend">👋 Make a friend</button>`;
+  }
+
+  function renderAssets() {
+    const houseOptions = [
+      { name: "Cozy apartment", price: 60000 },
+      { name: "Small family home", price: 180000 },
+      { name: "Spacious house", price: 420000 },
+      { name: "Dream mansion", price: 1200000 }
+    ];
+    const carOptions = [
+      { name: "Used hatchback", price: 9000 },
+      { name: "Family sedan", price: 28000 },
+      { name: "Electric car", price: 65000 },
+      { name: "Luxury sports car", price: 180000 }
+    ];
+    return `<div class="section-title">Assets & lifestyle</div>
+      <div class="notice">Purchases are paid from your bank balance. Keep some savings for unexpected expenses.</div>
+      <div class="section-title">Home ${game.house ? `<span class="pill">Owned: ${escapeHTML(game.house.name)}</span>` : ""}</div>
+      ${!game.house ? `<div class="list">${houseOptions.map((h, i) => `
+        <div class="list-row"><div><strong>🏠 ${h.name}</strong><div class="sub">${money(h.price)}</div></div>
+          <button class="primary small" data-action="house:${i}" ${game.money < h.price ? "disabled" : ""}>Buy</button></div>`).join("")}</div>` :
+        `<div class="list-row"><div><strong>🏠 ${escapeHTML(game.house.name)}</strong><div class="sub">Your home</div></div>
+          <button class="secondary small" data-action="sellhouse">Sell</button></div>`}
+      <div class="section-title">Vehicle ${game.car ? `<span class="pill">Owned: ${escapeHTML(game.car.name)}</span>` : ""}</div>
+      ${!game.car ? `<div class="list">${carOptions.map((c, i) => `
+        <div class="list-row"><div><strong>🚗 ${c.name}</strong><div class="sub">${money(c.price)}</div></div>
+          <button class="primary small" data-action="car:${i}" ${game.money < c.price ? "disabled" : ""}>Buy</button></div>`).join("")}</div>` :
+        `<div class="list-row"><div><strong>🚗 ${escapeHTML(game.car.name)}</strong><div class="sub">Your vehicle</div></div>
+          <button class="secondary small" data-action="sellcar">Sell</button></div>`}`;
+  }
+
+  function renderAchievements() {
+    const possible = [
+      ["First steps", game.age >= 1, "Celebrate your first birthday."],
+      ["Adulting", game.age >= 18, "Reach adulthood."],
+      ["Career starter", !!game.job, "Get your first job."],
+      ["Home sweet home", !!game.house, "Buy a home."],
+      ["On the road", !!game.car, "Buy a vehicle."],
+      ["In love", !!game.partner, "Find a partner."],
+      ["Parent", game.children.length > 0, "Have a child."],
+      ["Bookworm", game.smarts >= 90, "Reach 90 smarts."],
+      ["Century club", game.age >= 100, "Live to 100."],
+      ["Millionaire", game.money >= 1000000, "Have a million dollars."]
+    ];
+    const unlocked = possible.filter(a => a[1]);
+    return `<div class="section-title">Achievements <span class="pill">${unlocked.length}/${possible.length}</span></div>
+      <div class="list">${possible.map(([name, done, description]) => `
+        <div class="list-row"><div><strong>${done ? "🏆" : "🔒"} ${name}</strong>
+          <div class="sub">${description}</div></div><span class="pill">${done ? "Unlocked" : "Locked"}</span></div>`).join("")}</div>`;
+  }
+
+  function render() {
+    if (!game) return;
+    renderProfile();
+    renderTabs();
+    const content = {
+      "Life": renderLife,
+      "Activities": renderActivities,
+      "School & Work": renderSchoolWork,
+      "Relationships": renderRelationships,
+      "Assets": renderAssets,
+      "Achievements": renderAchievements
+    }[currentTab]();
+    $("#content").innerHTML = content;
+    $("#content").querySelectorAll("[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => handleAction(btn.dataset.action));
+    });
+    save(true);
+  }
+
+  function randomLifeEvent() {
+    if (game.age < 3) return;
+    const events = [
+      () => { game.health = clamp(game.health - rand(1, 7)); addEvent("🤧", "You caught a minor bug.", "A little rest should help."); },
+      () => { game.happiness = clamp(game.happiness + rand(3, 9)); addEvent("☀️", "You had a really nice day.", "Your mood improved."); },
+      () => {
+        const amount = rand(50, 500);
+        game.money += amount;
+        addEvent("🎁", "A relative sent you a bit of money.", money(amount));
+      },
+      () => { game.smarts = clamp(game.smarts + rand(0, 2)); addEvent("💡", "You learned something new."); },
+      () => {
+        if (game.job) {
+          game.income = Math.round(game.income * 1.06);
+          game.job.pay = game.income;
+          addEvent("📈", "You got a raise at work.", `New salary: ${money(game.income)}/year`);
+        } else if (game.age >= 18) {
+          game.happiness = clamp(game.happiness - 5);
+          addEvent("🌧️", "It was a stressful year.", "You could use some downtime.");
+        }
+      },
+      () => {
+        if (game.partner && Math.random() < .5) {
+          game.partner.quality = clamp(game.partner.quality + rand(2, 8));
+          addEvent("💞", "You and your partner felt closer this year.");
+        }
+      }
+    ];
+    pick(events)();
+  }
+
+  function ageUp() {
+    if (!game.alive) return;
+    game.age++;
+    game.year++;
+    game.health = clamp(game.health - (game.age > 65 ? rand(2, 7) : rand(0, 2)));
+    game.happiness = clamp(game.happiness - rand(0, 2));
+
+    if (game.age === 4) { game.school = "Preschool"; addEvent("🧸", "You started preschool."); }
+    if (game.age === 6) { game.school = "Primary School"; addEvent("🏫", "Your first day of primary school!"); }
+    if (game.age === 13) { game.school = "Secondary School"; addEvent("📚", "You started secondary school."); }
+    if (game.age === 18) {
+      game.school = "Graduated";
+      game.education = 18;
+      addEvent("🎓", "You graduated from secondary school.", "You can now apply for adult jobs.");
+    }
+
+    if (game.job) {
+      const takeHome = Math.round(game.income * (game.house ? .78 : .88));
+      game.money += takeHome;
+      game.money -= game.house ? 9000 : 0;
+      game.money -= game.car ? 2400 : 0;
+      addEvent("💼", "You worked another year.", `Earned ${money(takeHome)} after tax and expenses.`);
+      if (Math.random() < .06) {
+        game.income = Math.round(game.income * 1.08);
+        game.job.pay = game.income;
+        addEvent("⭐", "You were promoted!", `New salary: ${money(game.income)}/year`);
+      }
+    }
+
+    if (game.arrested) {
+      game.prisonYears--;
+      game.happiness = clamp(game.happiness - 10);
+      if (game.prisonYears <= 0) {
+        game.arrested = false;
+        addEvent("🔓", "You were released from prison.");
+      } else addEvent("🚔", "You spent another year in prison.", `${game.prisonYears} year(s) left.`);
+    }
+
+    game.children.forEach(child => child.age++);
+    if (game.partner && game.partner.age) game.partner.age++;
+    randomLifeEvent();
+
+    if (game.partner && game.partner.quality <= 5 && Math.random() < .35) {
+      const name = game.partner.name;
+      game.partner = null;
+      addEvent("💔", `You and ${name} broke up.`, "The relationship had been struggling.");
+    }
+
+    if (game.health <= 0 || (game.age > 60 && Math.random() < Math.min(.04 + (game.age - 60) * .012, .55))) {
+      game.alive = false;
+      game.health = Math.max(0, game.health);
+      addEvent("🕊️", "Your life came to an end.", `You lived to age ${game.age}.`);
+    }
+    if (game.age >= 100 && !game.achievements.includes("Century club")) game.achievements.push("Century club");
+    render();
+    if (game.alive) toast(`You are now ${game.age}.`);
+  }
+
+  function modal(title, body, onConfirm, confirmLabel = "Confirm") {
+    $("#modalRoot").innerHTML = `<div class="modal-backdrop"><div class="modal">
+      <h2>${title}</h2><div>${body}</div>
+      <div class="modal-actions"><button class="secondary" id="cancelModal">Cancel</button>
+        <button class="primary" id="confirmModal">${confirmLabel}</button></div>
+    </div></div>`;
+    $("#cancelModal").onclick = () => $("#modalRoot").innerHTML = "";
+    $("#confirmModal").onclick = () => { $("#modalRoot").innerHTML = ""; onConfirm(); };
+    $("#modalRoot").querySelector(".modal-backdrop").onclick = e => {
+      if (e.target.classList.contains("modal-backdrop")) $("#modalRoot").innerHTML = "";
+    };
+  }
+
+  function startScreen() {
+    $("#modalRoot").innerHTML = `<div class="modal-backdrop"><div class="modal">
+      <h2>Start a new life 🌱</h2>
+      <p>Create a character, then make choices and see where life takes them.</p>
+      <div class="form-row">
+        <label>Name<input id="newName" maxlength="32" placeholder="Leave blank for a random name"></label>
+        <label>Pronouns / character
+          <select id="newGender"><option>Female</option><option>Male</option><option>Nonbinary</option></select>
+        </label>
+      </div>
+      <label>Country<select id="newCountry">${countries.map(c => `<option>${c}</option>`).join("")}</select></label>
+      <div class="modal-actions"><button class="primary" id="startGame">Start life</button></div>
+    </div></div>`;
+    $("#startGame").onclick = () => {
+      const gender = $("#newGender").value;
+      const name = $("#newName").value.trim();
+      const country = $("#newCountry").value;
+      game = newGame({ gender, name: name || undefined, country });
+      addEvent("👶", `You were born in ${country}.`, "A brand-new life begins.");
+      $("#modalRoot").innerHTML = "";
+      currentTab = "Life";
+      render();
+    };
+  }
+
+  function changeMoney(amount) {
+    game.money += amount;
+    if (game.money < 0) {
+      game.happiness = clamp(game.happiness - 6);
+      addEvent("💸", "Your expenses exceeded your savings.", "Your balance is below zero.");
+    }
+  }
+
+  function handleAction(action) {
+    if (action === "age") return ageUp();
+    if (action === "restart") return startScreen();
+    if (action === "journal") {
+      game.happiness = clamp(game.happiness + 4);
+      addEvent("📝", "You wrote in your journal.", "It helped clear your head.");
+    } else if (action === "exercise") {
+      game.health = clamp(game.health + rand(4, 9));
+      game.happiness = clamp(game.happiness + 2);
+      addEvent("🏃", "You exercised.", "You feel a little healthier.");
+    } else if (action === "read") {
+      game.smarts = clamp(game.smarts + rand(3, 7));
+      game.happiness = clamp(game.happiness + 1);
+      addEvent("📚", "You read a book.", "Your smarts improved.");
+    } else if (action === "meditate") {
+      game.happiness = clamp(game.happiness + rand(5, 10));
+      game.health = clamp(game.health + 1);
+      addEvent("🧘", "You took time to meditate.", "You feel calmer.");
+    } else if (action === "art") {
+      game.happiness = clamp(game.happiness + rand(3, 8));
+      game.smarts = clamp(game.smarts + 1);
+      addEvent("🎨", "You took an art class.", "A creative afternoon.");
+    } else if (action === "party") {
+      changeMoney(-100);
+      game.happiness = clamp(game.happiness + rand(7, 12));
+      addEvent("🎉", "You went out and had fun.", "It cost $100.");
+    } else if (action === "doctor") {
+      changeMoney(-500);
+      game.health = clamp(game.health + rand(12, 25));
+      addEvent("🩺", "You visited a doctor.", "Your health improved.");
+    } else if (action === "volunteer") {
+      game.happiness = clamp(game.happiness + 5);
+      addEvent("🤝", "You volunteered in your community.", "You made a difference.");
+    } else if (action === "luck") {
+      const result = rand(1, 4);
+      if (result === 1) { changeMoney(rand(100, 2000)); addEvent("🎲", "You had a lucky day!", "You found some money."); }
+      else if (result === 2) { game.health = clamp(game.health - 8); addEvent("🤕", "A little mishap spoiled your day.", "Take it easy."); }
+      else { game.happiness = clamp(game.happiness + 5); addEvent("✨", "Something nice happened.", "You feel lucky."); }
+    } else if (action === "college" || action === "university") {
+      const isUni = action === "university";
+      const cost = isUni ? 8000 : 2000;
+      if (game.money < cost) return toast("You don't have enough money for tuition.");
+      changeMoney(-cost);
+      game.age += isUni ? 4 : 2;
+      game.education += isUni ? 4 : 2;
+      game.school = isUni ? "University graduate" : "College graduate";
+      game.smarts = clamp(game.smarts + rand(5, 12));
+      addEvent("🎓", `You completed ${isUni ? "university" : "community college"}.`, `${game.education} years of education.`);
+      game.year += isUni ? 4 : 2;
+    } else if (action.startsWith("job:")) {
+      const available = jobs.filter(j => game.age >= j.education && game.education >= j.education);
+      const job = available[Number(action.split(":")[1])];
+      if (!job) return;
+      game.job = { ...job };
+      game.income = job.pay;
+      game.happiness = clamp(game.happiness + 3);
+      addEvent("💼", `You got a job as a ${job.title}.`, `Salary: ${money(job.pay)}/year.`);
+    } else if (action === "quit") {
+      const title = game.job.title;
+      game.job = null; game.income = 0;
+      addEvent("🚪", `You quit your job as a ${title}.`);
+    } else if (action === "retire") {
+      game.job = null; game.income = 0;
+      addEvent("🌴", "You retired from work.", "Enjoy your free time!");
+    } else if (action === "date") {
+      if (game.age < 16) return toast("You're too young to date.");
+      if (game.partner) {
+        game.partner.quality = clamp(game.partner.quality + rand(5, 13));
+        game.happiness = clamp(game.happiness + 3);
+        addEvent("💐", `You spent quality time with ${game.partner.name}.`, "Your relationship grew stronger.");
+      } else {
+        const name = `${pick(firstNames[pick(Object.keys(firstNames))])} ${pick(lastNames)}`;
+        game.partner = { name, status: "Dating", quality: rand(55, 85), age: game.age };
+        game.happiness = clamp(game.happiness + 5);
+        addEvent("💌", `You started dating ${name}.`, "A new relationship begins.");
+      }
+    } else if (action === "propose") {
+      if (!game.partner) return;
+      if (game.age < 18) return toast("You need to be an adult first.");
+      if (game.partner.quality < 35) return toast("Your relationship needs more care first.");
+      game.partner.status = "Married";
+      game.partner.quality = clamp(game.partner.quality + 10);
+      addEvent("💍", `You married ${game.partner.name}!`, "Congratulations!");
+    } else if (action === "breakup") {
+      if (!game.partner) return;
+      const name = game.partner.name;
+      game.partner = null;
+      game.happiness = clamp(game.happiness - 8);
+      addEvent("💔", `You and ${name} split up.`);
+    } else if (action === "child") {
+      if (game.age < 18) return;
+      const childName = `${pick(firstNames[pick(Object.keys(firstNames))])} ${pick(lastNames)}`;
+      game.children.push({ name: childName, age: 0 });
+      game.happiness = clamp(game.happiness + 8);
+      addEvent("👶", `You welcomed ${childName} into your family.`, "A new chapter begins.");
+    } else if (action === "friend") {
+      const name = `${pick(firstNames[pick(Object.keys(firstNames))])} ${pick(lastNames)}`;
+      if (game.friends.includes(name)) return toast("You already know them!");
+      game.friends.push(name);
+      game.happiness = clamp(game.happiness + 3);
+      addEvent("👋", `You made a new friend: ${name}.`);
+    } else if (action.startsWith("house:")) {
+      const options = [
+        { name: "Cozy apartment", price: 60000 },
+        { name: "Small family home", price: 180000 },
+        { name: "Spacious house", price: 420000 },
+        { name: "Dream mansion", price: 1200000 }
+      ];
+      const item = options[Number(action.split(":")[1])];
+      if (!item || game.money < item.price) return;
+      changeMoney(-item.price);
+      game.house = item;
+      addEvent("🏠", `You bought a ${item.name}.`, `Paid ${money(item.price)}.`);
+    } else if (action.startsWith("car:")) {
+      const options = [
+        { name: "Used hatchback", price: 9000 },
+        { name: "Family sedan", price: 28000 },
+        { name: "Electric car", price: 65000 },
+        { name: "Luxury sports car", price: 180000 }
+      ];
+      const item = options[Number(action.split(":")[1])];
+      if (!item || game.money < item.price) return;
+      changeMoney(-item.price);
+      game.car = item;
+      addEvent("🚗", `You bought a ${item.name}.`, `Paid ${money(item.price)}.`);
+    } else if (action === "sellhouse") {
+      const value = Math.round(game.house.price * .75);
+      changeMoney(value); game.house = null;
+      addEvent("🏠", "You sold your home.", `Received ${money(value)}.`);
+    } else if (action === "sellcar") {
+      const value = Math.round(game.car.price * .65);
+      changeMoney(value); game.car = null;
+      addEvent("🚗", "You sold your vehicle.", `Received ${money(value)}.`);
+    }
+    render();
+  }
+
+  $("#saveBtn").onclick = () => save();
+  $("#newBtn").onclick = () => {
+    modal("Start over?", "This will replace the life saved in this browser. This cannot be undone.",
+      () => startScreen(), "Start over");
+  };
+
+  game = load();
+  if (game) render();
+  else startScreen();
+})();
+</script>
+</body>
+</html>
