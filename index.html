@@ -5,711 +5,394 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Life Sim</title>
 <style>
-  :root {
-    --bg:#f1f5f9; --card:#fff; --ink:#172033; --muted:#667085;
-    --line:#e5eaf0; --green:#16a36a; --green-light:#e8f6ee;
-  }
-  * { box-sizing:border-box }
-  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,sans-serif }
-  button,input,select { font:inherit }
-  button { cursor:pointer; border:0; border-radius:10px; padding:10px 14px; font-weight:700; transition:.12s }
-  button:hover:not(:disabled) { transform:translateY(-1px); filter:brightness(.97) }
-  button:disabled { cursor:not-allowed; opacity:.45 }
-  .primary { background:var(--green); color:white }
-  .secondary { background:var(--green-light); color:#08784b }
-  .danger { background:#fff0f1; color:#b72d3b }
-  .app { max-width:1140px; margin:auto; padding:20px 16px 40px }
-  header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px }
-  .brand { display:flex; align-items:center; gap:10px }
-  .logo { width:42px; height:42px; display:grid; place-items:center; background:var(--green); color:white; border-radius:13px; font-size:23px }
-  h1 { font-size:22px; margin:0 }
-  .tagline,.sub { color:var(--muted); font-size:13px }
-  .header-actions { display:flex; gap:7px }
-  .grid { display:grid; grid-template-columns:320px 1fr; gap:16px }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 10px 28px #17203310 }
-  .profile { position:sticky; top:14px; align-self:start }
-  .name { font-size:20px; font-weight:800 }
-  .portrait { height:180px; display:grid; place-items:center; overflow:hidden; margin:14px 0; border:1px solid var(--line); border-radius:14px; background:linear-gradient(#e6f5ff 0 68%,#b9e3bb 68%) }
-  .avatar { font-size:98px; filter:drop-shadow(0 5px 2px #0002); line-height:1 }
-  .section-title { display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px; font-weight:800 }
-  .meter { margin:11px 0 }
-  .meter-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px }
-  .track { height:9px; overflow:hidden; border-radius:99px; background:#edf0f4 }
-  .fill { height:100%; border-radius:inherit }
-  .green { background:#28b779 }.blue { background:#4a91e8 }.pink { background:#e97191 }.orange { background:#efaa37 }
-  .money { display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:12px; background:#f7faf8; border-radius:11px }
-  .money strong { font-size:19px }
-  .tabs { display:flex; gap:7px; overflow:auto; margin-bottom:12px }
-  .tab { background:#e9edf3; color:#596579; padding:8px 12px; white-space:nowrap }
-  .tab.active { background:#dff3e8; color:#08784b }
-  .main-card { min-height:600px }
-  .actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px }
-  .action { text-align:left; background:#f5f8fb; color:var(--ink); border:1px solid var(--line); min-height:56px }
-  .action span { display:block; font-size:12px; color:var(--muted); font-weight:500 }
-  .feed,.list { display:flex; flex-direction:column; gap:9px }
-  .event { display:grid; grid-template-columns:30px 1fr; gap:9px; padding:11px 12px; border:1px solid var(--line); border-radius:11px }
-  .event-icon { font-size:20px }
-  .event small { color:var(--muted); display:block; margin-top:2px }
-  .pill { display:inline-block; border-radius:100px; padding:3px 8px; font-size:12px; background:#edf2f7; color:#526075 }
-  .list-row { display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid var(--line); border-radius:11px; padding:12px }
-  .row-buttons { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:5px }
-  .notice { padding:12px; background:#fff8e9; border:1px solid #f4dfb1; border-radius:11px; margin:10px 0 }
-  .small { padding:7px 10px; font-size:13px }
-  .empty { text-align:center; padding:25px 12px; color:var(--muted) }
-  .footer { text-align:center; color:var(--muted); font-size:12px; padding-top:18px }
-  .modal-backdrop { position:fixed; inset:0; display:grid; place-items:center; background:#10182888; padding:16px; z-index:5 }
-  .modal { width:min(480px,100%); max-height:90vh; overflow:auto; background:white; padding:22px; border-radius:17px; box-shadow:0 22px 80px #10182855 }
-  .modal h2 { margin:0 0 8px }
-  .modal p { color:var(--muted) }
-  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:12px 0 }
-  label { font-weight:700; font-size:13px }
-  input,select { width:100%; padding:10px; border:1px solid var(--line); border-radius:9px; margin-top:5px; background:white }
-  .modal-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin-top:16px }
-  .lesson-progress { height:8px; background:#edf0f4; border-radius:99px; overflow:hidden; margin:10px 0 }
-  .lesson-progress div { height:100%; background:var(--green); transition:width .2s }
-  @media(max-width:760px) { .grid { grid-template-columns:1fr } .profile { position:static } .main-card { min-height:450px } }
-  @media(max-width:420px) { .app { padding:14px 10px 35px } .card { padding:14px } .actions { grid-template-columns:1fr 1fr } }
+:root{--bg:#f1f5f9;--card:#fff;--ink:#172033;--muted:#667085;--line:#e5eaf0;--green:#16a36a;--greenlight:#e8f6ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
+button:hover:not(:disabled){filter:brightness(.96);transform:translateY(-1px)}
+button:disabled{cursor:not-allowed;opacity:.45}
+.primary{background:var(--green);color:white}.secondary{background:var(--greenlight);color:#08784b}.danger{background:#fff0f1;color:#b72d3b}
+.app{max-width:1140px;margin:auto;padding:20px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;display:grid;place-items:center;background:var(--green);color:white;border-radius:13px;font-size:23px}
+h1{font-size:22px;margin:0}.tagline,.sub{color:var(--muted);font-size:13px}.header-actions{display:flex;gap:7px}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 28px #17203310}
+.profile{position:sticky;top:14px;align-self:start}.name{font-size:20px;font-weight:800}
+.portrait{height:280px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;margin:14px 0;border:1px solid var(--line);border-radius:14px;background:linear-gradient(#e6f5ff 0 72%,#b9e3bb 72%);position:relative}
+.person{height:92%;width:150px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;filter:drop-shadow(0 4px 2px #0002)}
+.person .head{z-index:2;position:relative;font-size:55px;line-height:1;height:62px}
+.person .body{z-index:1;width:94px;height:100px;border-radius:35px 35px 18px 18px;background:#4b77ae;border:3px solid #294768;position:relative}
+.person .arms{position:absolute;z-index:0;top:88px;width:142px;height:24px;border-radius:20px;background:#4b77ae;border:3px solid #294768}
+.person .legs{display:flex;gap:13px;height:75px;z-index:0}
+.person .leg{width:35px;height:75px;background:#26364d;border:3px solid #1c293b;border-radius:8px 8px 12px 12px}
+.person .shoe{height:13px;width:42px;background:#343c49;border-radius:12px;margin-top:-4px}
+.person.baby{height:62%;width:125px}
+.person.baby .head{font-size:48px;height:53px}
+.person.baby .body{width:88px;height:75px;border-radius:38px;background:#f3c5d4;border-color:#ce94a5}
+.person.baby .arms{top:77px;width:125px;background:#f3c5d4;border-color:#ce94a5}
+.person.baby .legs{height:35px;gap:8px}
+.person.baby .leg{width:31px;height:34px;background:#f3c5d4;border-color:#ce94a5}
+.person.baby .shoe{display:none}
+.person.diaper .body{background:#f1c7d4;border-color:#c98d9c}
+.person.diaper .legs{height:48px}
+.person.diaper .leg{height:48px;background:#f1c7d4;border-color:#c98d9c}
+.person.diaper:after{content:"";position:absolute;z-index:3;bottom:60px;width:90px;height:39px;border-radius:12px 12px 20px 20px;background:#fff;border:3px solid #d6dce6}
+.person.furry .head{font-size:57px}
+.person.furry .body,.person.furry .arms,.person.furry .leg{background:#c56c32;border-color:#7c3f22}
+.person.furry .body{width:105px;height:110px;border-radius:43px}
+.person.furry .arms{width:150px;background:#c56c32;border-color:#7c3f22}
+.person.furry .leg{background:#c56c32;border-color:#7c3f22}
+.person.furry .shoe{background:#653d2c}
+.furry-belly{position:absolute;z-index:2;top:85px;width:52px;height:68px;border-radius:50%;background:#f4d7a9}
+.furry-tail{position:absolute;z-index:0;right:5px;bottom:86px;width:50px;height:35px;border-radius:10px 30px 30px 10px;background:#c56c32;border:4px solid #7c3f22;transform:rotate(-15deg)}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;font-weight:800}
+.meter{margin:11px 0}.meter-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.track{height:9px;overflow:hidden;border-radius:99px;background:#edf0f4}.fill{height:100%;border-radius:inherit}
+.green{background:#28b779}.blue{background:#4a91e8}.pink{background:#e97191}.orange{background:#efaa37}
+.money{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:12px;background:#f7faf8;border-radius:11px}.money strong{font-size:19px}
+.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.tab{background:#e9edf3;color:#596579;padding:8px 12px;white-space:nowrap}.tab.active{background:#dff3e8;color:#08784b}
+.main-card{min-height:600px}.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.action{text-align:left;background:#f5f8fb;color:var(--ink);border:1px solid var(--line);min-height:56px}
+.action span{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.feed,.list{display:flex;flex-direction:column;gap:9px}.event{display:grid;grid-template-columns:30px 1fr;gap:9px;padding:11px 12px;border:1px solid var(--line);border-radius:11px}
+.event-icon{font-size:20px}.event small{color:var(--muted);display:block;margin-top:2px}
+.pill{display:inline-block;border-radius:100px;padding:3px 8px;font-size:12px;background:#edf2f7;color:#526075}
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:11px;padding:12px}
+.row-buttons{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.notice{padding:12px;background:#fff8e9;border:1px solid #f4dfb1;border-radius:11px;margin:10px 0}
+.small{padding:7px 10px;font-size:13px}.empty{text-align:center;padding:25px 12px;color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding-top:18px}
+.modal-backdrop{position:fixed;inset:0;display:grid;place-items:center;background:#10182888;padding:16px;z-index:5}
+.modal{width:min(480px,100%);max-height:90vh;overflow:auto;background:white;padding:22px;border-radius:17px;box-shadow:0 22px 80px #10182855}
+.modal h2{margin:0 0 8px}.modal p{color:var(--muted)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+label{font-weight:700;font-size:13px}input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;margin-top:5px;background:white}
+.modal-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}
+.lesson-progress{height:8px;background:#edf0f4;border-radius:99px;overflow:hidden;margin:10px 0}.lesson-progress div{height:100%;background:var(--green)}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.profile{position:static}.main-card{min-height:450px}}
+@media(max-width:420px){.app{padding:14px 10px 35px}.card{padding:14px}.actions{grid-template-columns:1fr 1fr}.portrait{height:245px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="brand">
-      <div class="logo">🌱</div>
-      <div><h1>Life Sim</h1><div class="tagline">A tiny life, entirely your choices.</div></div>
-    </div>
-    <div class="header-actions">
-      <button class="secondary small" id="saveBtn">Save</button>
-      <button class="danger small" id="newBtn">New life</button>
-    </div>
-  </header>
-  <div class="grid">
-    <aside class="card profile" id="profile"></aside>
-    <main class="card main-card">
-      <nav class="tabs" id="tabs"></nav>
-      <div id="content"></div>
-    </main>
-  </div>
-  <div class="footer">Progress saves in this browser. Publish this file using GitHub Pages.</div>
+<header>
+  <div class="brand"><div class="logo">🌱</div><div><h1>Life Sim</h1><div class="tagline">A tiny life, entirely your choices.</div></div></div>
+  <div class="header-actions"><button class="secondary small" id="saveBtn">Save</button><button class="danger small" id="newBtn">New life</button></div>
+</header>
+<div class="grid">
+  <aside class="card profile" id="profile"></aside>
+  <main class="card main-card"><nav class="tabs" id="tabs"></nav><div id="content"></div></main>
+</div>
+<div class="footer">Progress saves in this browser. Publish this file using GitHub Pages.</div>
 </div>
 <div id="modalRoot"></div>
-
 <script>
 (() => {
-  "use strict";
+"use strict";
+const SAVE_KEY="life-sim-save-v4", $=s=>document.querySelector(s);
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(n,min=0,max=100)=>Math.max(min,Math.min(max,n));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const firstNames={Female:["Ava","Mia","Sofia","Amara","Nina","Lena","Isla","Zoe"],Male:["Leo","Noah","Ethan","Jay","Theo","Kai","Omar","Sam"],Nonbinary:["Alex","River","Robin","Sage","Ari","Charlie","Sky","Morgan"]};
+const lastNames=["Brooks","Rivera","Kim","Patel","Morgan","Bennett","Okafor","Reed"];
+const countries=["United States","Canada","United Kingdom","Australia","India","Japan","Brazil","France"];
+const jobs=[
+{title:"Retail Associate",pay:24000,education:16},{title:"Cafe Worker",pay:26000,education:16},
+{title:"Furry",pay:0,education:16,furry:true},{title:"Furry Artist",pay:0,education:16,furry:true},
+{title:"Furry Suit Performer",pay:0,education:16,furry:true},{title:"Furry Community Host",pay:0,education:16,furry:true},
+{title:"Office Assistant",pay:33000,education:18,needsReading:true},{title:"Lorry Driver",pay:46000,education:18},
+{title:"Teacher",pay:52000,education:21,needsReading:true},{title:"Nurse",pay:68000,education:21,needsReading:true},
+{title:"Banker",pay:72000,education:21,needsReading:true},{title:"Software Developer",pay:90000,education:21,needsReading:true},
+{title:"Engineer",pay:88000,education:21,needsReading:true},{title:"Lawyer",pay:125000,education:24,needsReading:true},
+{title:"Doctor",pay:155000,education:25,needsReading:true},{title:"Chef",pay:48000,education:18},
+{title:"Artist",pay:38000,education:18},{title:"Athlete",pay:76000,education:18},
+{title:"Electrician",pay:62000,education:18},{title:"Plumber",pay:59000,education:18},
+{title:"Police Officer",pay:65000,education:21,needsReading:true},{title:"Firefighter",pay:58000,education:18},
+{title:"Delivery Driver",pay:35000,education:18},{title:"Mechanic",pay:48000,education:18},
+{title:"Accountant",pay:68000,education:21,needsReading:true},{title:"Farmer",pay:39000,education:16},
+{title:"Writer",pay:45000,education:18,needsReading:true}
+];
 
-  const SAVE_KEY = "life-sim-save-v3";
-  const $ = s => document.querySelector(s);
-  const rand = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
-  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
-  const clamp = (n,min=0,max=100) => Math.max(min,Math.min(max,n));
-  const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const lessonTopics=[
+{id:"toilet",title:"Toilet train",age:3,skill:"toiletTrained",icon:"🚽",effort:1,yes:"You practiced toilet training and learned to use the toilet.",no:"You skipped toilet training. You will keep wearing a diaper, and this lesson will not return."},
+{id:"reading",title:"Learn to read",age:5,skill:"reading",icon:"📖",effort:2,yes:"You practiced reading and learned an important skill.",no:"You chose not to learn to read. This lesson will not return."},
+{id:"manners",title:"Practice good manners",age:4,skill:"manners",icon:"🙂",effort:1,yes:"You practiced being polite and considerate.",no:"You skipped the manners lesson."},
+{id:"swimming",title:"Learn to swim",age:7,skill:"swimming",icon:"🏊",effort:2,yes:"You practiced swimming and learned water safety.",no:"You skipped swimming lessons."},
+{id:"math",title:"Learn multiplication",age:8,skill:"math",icon:"➗",effort:2,yes:"You practiced multiplication and learned your times tables.",no:"You chose not to learn multiplication."},
+{id:"tyingShoes",title:"Learn to tie your shoes",age:6,skill:"tyingShoes",icon:"👟",effort:1,yes:"You practiced tying your shoes until you got it.",no:"You skipped the shoe-tying lesson."},
+{id:"cycling",title:"Learn to ride a bicycle",age:8,skill:"cycling",icon:"🚲",effort:2,yes:"You practiced riding a bicycle and learned to balance.",no:"You skipped bicycle lessons."},
+{id:"cooking",title:"Learn basic cooking",age:12,skill:"cooking",icon:"🍳",effort:2,yes:"You learned some basic cooking skills.",no:"You skipped the cooking lesson."}
+];
+const extraLessonNames=["First words","Walking","Sharing toys","Brushing teeth","Getting dressed","Following instructions","Recognizing letters","Counting to ten","Writing your name","Crossing streets safely","Making your bed","Keeping your room tidy","Using a computer","Typing","Telling time","Basic addition","Basic subtraction","Fractions","Reading maps","Using public transport","Making a simple budget","Saving money","Doing laundry","Washing dishes","Preparing a snack","Basic first aid","Teamwork","Listening carefully","Public speaking","Asking for help","Solving problems","Planning your day","Setting goals","Managing stress","Digital safety","Online privacy","Spotting scams","Respecting boundaries","Resolving disagreements","Apologizing","Making a phone call","Writing an email","Filling out a form","Job interview practice","Workplace teamwork","Time management","Cooking rice","Using kitchen safety","Understanding nutrition","Sleep habits","Stretching safely","Gardening","Plant care","Basic sewing","Simple repairs","Fire safety","Emergency contacts","Recycling","Caring for a pet","Road safety","Understanding emotions","Being a good friend","Making a study plan","Reading instructions"];
+const lessons=lessonTopics.slice();
+extraLessonNames.forEach((title,i)=>lessons.push({
+ id:"extra"+i,title,age:4+Math.floor(i/3),skill:"extra"+i,
+ icon:["🧠","📘","🛠️","🌟"][i%4],effort:i%3===0?1:2,
+ yes:`You practiced ${title.toLowerCase()} and learned a useful life skill.`,
+ no:`You chose to skip ${title.toLowerCase()}. This lesson will not return.`
+}));
+lessons.sort((a,b)=>a.age-b.age);
+const tabs=["Life","Activities","School & Work","Relationships","Assets","Lessons"];
+let currentTab="Life",game=null;
 
-  const firstNames = {
-    Female:["Ava","Mia","Sofia","Amara","Nina","Lena","Isla","Zoe"],
-    Male:["Leo","Noah","Ethan","Jay","Theo","Kai","Omar","Sam"],
-    Nonbinary:["Alex","River","Robin","Sage","Ari","Charlie","Sky","Morgan"]
+function newGame(data={}) {
+ const gender=data.gender||pick(Object.keys(firstNames));
+ return {name:data.name||`${pick(firstNames[gender])} ${pick(lastNames)}`,gender,country:data.country||pick(countries),
+ age:0,health:90,happiness:75,smarts:rand(35,85),looks:rand(35,85),money:0,income:0,education:0,
+ school:"Toddler",job:null,partner:null,children:[],friends:[],house:null,car:null,alive:true,
+ arrested:false,prisonYears:0,history:[],year:1,skills:{},declinedLessons:[],lessonQueue:[],diaper:true,...data};
+}
+function isFurryJob(){return !!game.job?.furry||!!game.job?.title?.startsWith("Furry")}
+function addEvent(icon,text,details=""){game.history.unshift({icon,text,details,age:game.age});game.history=game.history.slice(0,120)}
+function save(silent=false){if(!game)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(game));if(!silent)toast("Game saved.")}catch{if(!silent)toast("Could not save.")}}
+function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&typeof s.age==="number")return s}catch{}return null}
+function toast(message){$("#toast")?.remove();const el=document.createElement("div");el.id="toast";el.textContent=message;Object.assign(el.style,{position:"fixed",bottom:"20px",left:"50%",transform:"translateX(-50%)",background:"#243044",color:"white",padding:"11px 16px",borderRadius:"10px",zIndex:"10"});document.body.append(el);setTimeout(()=>el.remove(),2300)}
+function money(n){return new Intl.NumberFormat(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n)}
+function characterMarkup(){
+ if(!game.alive)return `<div class="avatar">🪦</div>`;
+ const baby=game.age<3;
+ const furry=isFurryJob();
+ const diaper=game.age<3&&!game.skills.toiletTrained;
+ let face=game.gender==="Female"?"👩":game.gender==="Male"?"👨":"🧑";
+ if(game.age===0)face="👶";
+ else if(game.age<13)face="🧒";
+ else if(game.age<18)face="🧑";
+ const head=furry?"🦊":face;
+ return `<div class="person ${baby?"baby":""} ${diaper?"diaper":""} ${furry?"furry":""}">
+   ${furry?'<div class="furry-tail"></div>':""}
+   <div class="head">${head}</div>
+   <div class="arms"></div><div class="body"></div>
+   ${furry?'<div class="furry-belly"></div>':""}
+   <div class="legs"><div class="leg"></div><div class="leg"></div></div>
+   <div class="shoe"></div>
+ </div>`;
+}
+function bar(label,value,color){return `<div class="meter"><div class="meter-label"><span>${label}</span><strong>${clamp(value)}%</strong></div><div class="track"><div class="fill ${color}" style="width:${clamp(value)}%"></div></div></div>`}
+function renderProfile(){
+ if(isFurryJob())game.happiness=100;
+ const notes=[];
+ if(game.age>=5)notes.push(game.skills.reading?"Can read":"Cannot read");
+ if(game.age<3&&!game.skills.toiletTrained)notes.push("Wearing a diaper");
+ $("#profile").innerHTML=`<div class="name">${esc(game.name)}</div>
+ <div class="sub">${game.alive?`${game.age} years old`:`Died at age ${game.age}`} · ${esc(game.country)}</div>
+ <div class="sub">${esc(game.school||"No school")}</div>
+ <div class="portrait">${characterMarkup()}</div>
+ <div class="sub">${isFurryJob()?"Full-body fox costume":game.job?esc(game.job.title):game.age<3?(game.skills.toiletTrained?"Baby":"Baby wearing diaper"):"Your character"}</div>
+ ${notes.length?`<div class="sub">${notes.join(" · ")}</div>`:""}
+ <div class="section-title">Your stats <span class="pill">${game.alive?"Alive":"Life complete"}</span></div>
+ ${bar("Health",game.health,"green")}${bar("Happiness",game.happiness,"orange")}
+ ${bar("Smarts",game.smarts,"blue")}${bar("Looks",game.looks,"pink")}
+ <div class="money"><div><div class="sub">Bank balance</div><strong>${money(game.money)}</strong></div><span>💵</span></div>
+ <div class="sub" style="margin-top:10px">Yearly income: ${money(game.income||0)}</div>
+ ${game.partner?`<div class="sub" style="margin-top:7px">❤️ Partner: ${esc(game.partner.name)}</div>`:""}
+ ${isFurryJob()?`<div class="notice">Furry career: unpaid, happiness stays maxed, and each relationship has a 60% yearly breakup chance.</div>`:""}
+ ${game.arrested?`<div class="notice">🚔 In prison: ${game.prisonYears} year(s) left.</div>`:""}`;
+}
+function renderTabs(){ $("#tabs").innerHTML=tabs.map(t=>`<button class="tab ${currentTab===t?"active":""}" data-tab="${t}">${t}</button>`).join("");$("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;render()})}
+function actionButton(title,description,action,disabled=false){return `<button class="action" data-action="${action}" ${disabled?"disabled":""}>${title}<span>${description}</span></button>`}
+function renderLife(){
+ return `<div class="section-title">Life events <span class="sub">Year ${game.year}</span></div>
+ ${!game.alive?`<div class="notice"><strong>Your story has ended.</strong><br>You lived to ${game.age} and earned ${money(game.money)}.</div><button class="primary" data-action="restart">Begin a new life</button>`:
+ `<div class="actions" style="margin-bottom:18px">${actionButton("🎂 Age up","Live through another year","age")}${actionButton("📝 Write a journal","Reflect and feel better","journal",game.age<6)}</div>`}
+ <div class="feed">${game.history.length?game.history.slice(0,18).map(e=>`<div class="event"><div class="event-icon">${e.icon}</div><div><strong>${esc(e.text)}</strong><small>Age ${e.age}${e.details?" · "+esc(e.details):""}</small></div></div>`).join(""):`<div class="empty">Your story starts here. Age up to see what happens!</div>`}</div>`;
+}
+function renderActivities(){
+ return `<div class="section-title">Activities</div><div class="actions">
+ ${actionButton("🏃 Exercise","Improve health","exercise",game.age<6)}
+ ${actionButton("📚 Read a book",game.skills.reading?"Boost smarts":"Requires reading lesson","read",game.age<4||!game.skills.reading)}
+ ${actionButton("🧘 Meditate","Improve happiness","meditate",game.age<8)}
+ ${actionButton("🎨 Take an art class","Have fun and learn","art",game.age<8)}
+ ${actionButton("🎉 Go out","Costs $100","party",game.age<16||game.money<100)}
+ ${actionButton("🩺 Visit a doctor","Health check · costs $500","doctor",game.money<500)}
+ ${actionButton("🤝 Volunteer","Help your community","volunteer",game.age<16)}
+ ${actionButton("🎲 Try your luck","Random outcome","luck",game.age<18)}
+ </div><div class="notice">Age up to experience yearly events and lessons.</div>`;
+}
+function renderSchoolWork(){
+ let available=jobs.filter(j=>game.age>=j.education&&game.education>=j.education);
+ if(!game.skills.reading)available=available.filter(j=>!j.needsReading);
+ return `<div class="section-title">School & work</div>
+ <div class="notice"><strong>Education:</strong> ${game.education?`${game.education} years completed`:"No qualifications"} · <strong>Status:</strong> ${esc(game.school)}</div>
+ ${game.job?`<div class="list-row"><div><strong>${esc(game.job.title)}</strong><div class="sub">${isFurryJob()?"Unpaid special career":money(game.income)+"/year"}</div></div>${!isFurryJob()?`<button class="danger small" data-action="quit">Quit job</button>`:""}</div>`:
+ `<div class="section-title">Available jobs</div><div class="list">${available.length?available.map(j=>`<div class="list-row"><div><strong>${esc(j.title)}</strong><div class="sub">${j.furry?"Unpaid special career":money(j.pay)+"/year"} · age ${j.education}+</div></div><button class="primary small" data-action="job:${jobs.indexOf(j)}">Apply</button></div>`).join(""):`<div class="empty">No jobs available. Lessons can unlock more options.</div>`}</div>`}
+ ${game.age>=18&&!game.job&&game.education<24?`<div class="section-title">Higher education</div><div class="actions">${actionButton("🎓 Community college","2 years · $2,000/year","college")}${actionButton("🏛️ University","4 years · $8,000/year","university")}</div>`:""}
+ <p class="sub">Some careers need reading. Skipping the reading lesson limits your options.</p>`;
+}
+function renderRelationships(){
+ return `<div class="section-title">Relationships <span class="sub">${game.children.length} child(ren)</span></div>
+ ${game.partner?`<div class="list-row"><div><strong>💞 ${esc(game.partner.name)}</strong><div class="sub">${esc(game.partner.status)} · relationship ${game.partner.quality}%</div></div><div class="row-buttons"><button class="secondary small" data-action="date">Go on a date</button><button class="secondary small" data-action="propose">Propose</button><button class="danger small" data-action="breakup">Break up</button></div></div>`:`<div class="notice">You are single.</div><button class="primary" data-action="date" ${game.age<16?"disabled":""}>💌 Meet someone</button>`}
+ ${game.age>=18&&game.partner&&game.children.length<6?`<button class="secondary" style="margin:10px 0" data-action="child">👶 Have a child with your partner</button>`:""}
+ <div class="section-title">Children</div>${game.children.length?`<div class="list">${game.children.map(c=>`<div class="list-row"><strong>🧒 ${esc(c.name)}</strong><span class="pill">Age ${c.age}</span></div>`).join("")}</div>`:`<div class="empty">No children yet.</div>`}
+ <div class="section-title">Friends</div><div class="sub">${game.friends.length?game.friends.map(esc).join(", "):"You have not made any friends yet."}</div><button class="secondary" style="margin-top:10px" data-action="friend">👋 Make a friend</button>`;
+}
+function renderAssets(){
+ const houses=[["Cozy apartment",60000],["Small family home",180000],["Spacious house",420000],["Dream mansion",1200000]];
+ const cars=[["Used hatchback",9000],["Family sedan",28000],["Electric car",65000],["Luxury sports car",180000]];
+ const shop=(items,type,owned)=>owned?`<div class="list-row"><strong>${type==="house"?"🏠":"🚗"} ${esc(owned.name)}</strong><button class="secondary small" data-action="sell${type}">Sell</button></div>`:`<div class="list">${items.map(([name,price],i)=>`<div class="list-row"><div><strong>${type==="house"?"🏠":"🚗"} ${name}</strong><div class="sub">${money(price)}</div></div><button class="primary small" data-action="${type}:${i}" ${game.money<price?"disabled":""}>Buy</button></div>`).join("")}</div>`;
+ return `<div class="section-title">Assets</div><div class="section-title">Home</div>${shop(houses,"house",game.house)}<div class="section-title">Vehicle</div>${shop(cars,"car",game.car)}`;
+}
+function renderLessons(){
+ const learned=Object.values(game.skills).filter(Boolean).length;
+ return `<div class="section-title">Lessons <span class="pill">${learned} learned · ${game.declinedLessons.length} skipped</span></div>
+ <div class="notice">There are ${lessons.length} lessons. At the right age, choose Yes to spend effort practicing or No to skip a lesson permanently. Skipping toilet training means your character keeps wearing a diaper.</div>
+ <div class="list">${lessons.map(l=>{const done=!!game.skills[l.skill],skip=game.declinedLessons.includes(l.id);const state=done?"✅ Learned":skip?"⛔ Skipped":game.age<l.age?"🔒 Age "+l.age:"⌛ Not learned";return `<div class="list-row"><div><strong>${l.icon} ${esc(l.title)}</strong><div class="sub">${state} · effort ${l.effort}</div></div></div>`}).join("")}</div>`;
+}
+function render(){
+ if(!game)return;game.skills||={};game.declinedLessons||=[];game.lessonQueue||=[];
+ if(isFurryJob()){game.happiness=100;game.income=0}
+ renderProfile();renderTabs();
+ const views={"Life":renderLife,"Activities":renderActivities,"School & Work":renderSchoolWork,"Relationships":renderRelationships,"Assets":renderAssets,"Lessons":renderLessons};
+ $("#content").innerHTML=views[currentTab]();
+ $("#content").querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>handleAction(b.dataset.action));
+ save(true);
+}
+function showLesson(lesson){
+ let progress=0;
+ const draw=()=>{
+  $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal"><h2>${lesson.icon} Lesson: ${esc(lesson.title)}</h2>
+  <p>Would you like to practice? Learning takes effort and time. Choosing No skips this lesson permanently.</p>
+  <p class="sub">Practice progress: ${progress}/${lesson.effort}</p><div class="lesson-progress"><div style="width:${progress/lesson.effort*100}%"></div></div>
+  <div class="modal-actions"><button class="danger" id="skipLesson">No — skip forever</button><button class="secondary" id="practiceLesson">${progress?"Keep practicing":"Yes — practice"}</button></div></div></div>`;
+  $("#skipLesson").onclick=()=>{
+    game.declinedLessons.push(lesson.id);
+    if(lesson.id==="toilet")game.diaper=true;
+    addEvent(lesson.icon,lesson.no,lesson.id==="toilet"?"You continue wearing a diaper.":"This lesson will not return.");
+    $("#modalRoot").innerHTML="";render();offerNextLesson();
   };
-  const lastNames=["Brooks","Rivera","Kim","Patel","Morgan","Bennett","Okafor","Reed"];
-  const countries=["United States","Canada","United Kingdom","Australia","India","Japan","Brazil","France"];
+  $("#practiceLesson").onclick=()=>{
+    progress++;game.happiness=clamp(game.happiness-1);
+    if(progress<lesson.effort){draw();return}
+    game.skills[lesson.skill]=true;
+    if(lesson.id==="toilet")game.diaper=false;
+    game.smarts=clamp(game.smarts+1);
+    addEvent(lesson.icon,lesson.yes,"You spent time and effort practicing.");
+    $("#modalRoot").innerHTML="";render();offerNextLesson();
+  };
+ };
+ draw();
+}
+function offerNextLesson(){const l=game.lessonQueue.shift();if(l)setTimeout(()=>showLesson(l),150)}
+function randomLifeEvent(){
+ const events=[];
+ if(game.age>=1&&game.age<=12)events.push(
+  ()=>{game.smarts=clamp(game.smarts+rand(1,4));addEvent("📖","You learned something at school.","Your smarts improved.")},
+  ()=>{game.happiness=clamp(game.happiness+rand(2,7));addEvent("🧸","You had a fun day with your family.")},
+  ()=>{game.health=clamp(game.health-rand(1,5));addEvent("🤧","You caught a small cold.","You rested and recovered.")}
+ );
+ if(game.age>=6)events.push(()=>addEvent("🩺","You had a routine health check.","Everything looks okay."));
+ if(game.age>=7&&game.age<=18)events.push(
+  ()=>{game.smarts=clamp(game.smarts+rand(1,4));addEvent("📝","You did well on a school assignment.")},
+  ()=>{game.happiness=clamp(game.happiness-rand(1,5));addEvent("📚","School felt challenging this year.")}
+ );
+ if(game.age>=10)events.push(()=>addEvent("👁️","You had an eye test.","Your eyes are doing well."));
+ if(game.job&&!isFurryJob())events.push(
+  ()=>{const bonus=rand(100,1500);game.money+=bonus;addEvent("🎁","You received a work bonus.",money(bonus))},
+  ()=>{game.happiness=clamp(game.happiness-rand(1,5));addEvent("😓","Work was stressful this year.")}
+ );
+ if(game.partner)events.push(()=>{game.partner.quality=clamp(game.partner.quality+rand(1,7));addEvent("❤️",`You shared a nice moment with ${game.partner.name}.`)});
+ events.push(
+  ()=>{const amount=rand(50,500);game.money+=amount;addEvent("🎁","A relative gave you some money.",money(amount))},
+  ()=>{game.happiness=clamp(game.happiness+rand(1,5));addEvent("☀️","You had a surprisingly good day.")},
+  ()=>{game.health=clamp(game.health-rand(1,5));addEvent("🤕","You had a minor accident.","Thankfully, it was not serious.")}
+ );
+ pick(events)();
+}
+function ageUp(){
+ if(!game.alive)return;
+ game.age++;game.year++;
+ game.health=clamp(game.health-(game.age>65?rand(2,7):rand(0,2)));
+ if(!isFurryJob())game.happiness=clamp(game.happiness-rand(0,2));else game.happiness=100;
+ if(game.age===4){game.school="Preschool";addEvent("🧸","You started preschool.")}
+ if(game.age===6){game.school="Primary School";addEvent("🏫","You started primary school.")}
+ if(game.age===13){game.school="Secondary School";addEvent("📚","You started secondary school.")}
+ if(game.age===18){game.school="Graduated";game.education=Math.max(game.education,18);addEvent("🎓","You graduated from secondary school.","You can apply for adult jobs.")}
+ game.lessonQueue.push(...lessons.filter(l=>l.age===game.age&&!game.skills[l.skill]&&!game.declinedLessons.includes(l.id)));
+ if(game.job&&!isFurryJob()){
+  const pay=Math.round(game.income*(game.house?.78:.88));game.money+=pay;
+  if(game.house)game.money-=9000;if(game.car)game.money-=2400;
+  addEvent("💼","You worked another year.",`Earned ${money(pay)} after expenses.`);
+  if(Math.random()<.06){game.income=Math.round(game.income*1.08);game.job.pay=game.income;addEvent("⭐","You got a raise!",`New salary: ${money(game.income)}/year`)}
+ }else if(isFurryJob()){game.income=0;addEvent("🦊","You spent another year in your furry career.","The special career is unpaid.")}
+ if(game.arrested){game.prisonYears--;game.happiness=clamp(game.happiness-10);if(game.prisonYears<=0){game.arrested=false;addEvent("🔓","You were released from prison.")}else addEvent("🚔","You spent another year in prison.",`${game.prisonYears} year(s) left.`)}
+ game.children.forEach(c=>c.age++);
+ randomLifeEvent();
+ if(game.partner){
+  if(isFurryJob()&&Math.random()<.60){const n=game.partner.name;game.partner=null;addEvent("💔",`You and ${n} broke up.`,"Your Furry career gave this relationship a 60% yearly breakup chance.")}
+  else if(!isFurryJob()&&game.partner.quality<=5&&Math.random()<.35){const n=game.partner.name;game.partner=null;addEvent("💔",`You and ${n} broke up.`,"The relationship had been struggling.")}
+ }
+ if(game.health<=0||(game.age>60&&Math.random()<Math.min(.04+(game.age-60)*.012,.55))){game.alive=false;game.health=Math.max(0,game.health);addEvent("🕊️","Your life came to an end.",`You lived to age ${game.age}.`)}
+ if(isFurryJob())game.happiness=100;
+ render();
+ if(game.lessonQueue.length)offerNextLesson();
+ if(game.alive)toast(`You are now ${game.age}.`);
+}
+function modal(title,body,onConfirm,label="Confirm"){
+ $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal"><h2>${title}</h2><div>${body}</div><div class="modal-actions"><button class="secondary" id="cancelModal">Cancel</button><button class="primary" id="confirmModal">${label}</button></div></div></div>`;
+ $("#cancelModal").onclick=()=>$("#modalRoot").innerHTML="";
+ $("#confirmModal").onclick=()=>{$("#modalRoot").innerHTML="";onConfirm()};
+}
+function beginCharacter(gender,name,country){
+ game=newGame({gender,name,country});addEvent("👶",`You were born in ${game.country}.`,"A brand-new life begins.");
+ $("#modalRoot").innerHTML="";currentTab="Life";render();
+}
+function startScreen(){
+ $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal"><h2>Start a new life 🌱</h2><p>Create a character or use the random button.</p>
+ <div class="form-row"><label>Name<input id="newName" maxlength="32" placeholder="Random name"></label><label>Character<select id="newGender"><option>Female</option><option>Male</option><option>Nonbinary</option></select></label></div>
+ <label>Country<select id="newCountry">${countries.map(c=>`<option>${c}</option>`).join("")}</select></label>
+ <div class="modal-actions"><button class="secondary" id="randomCharacter">🎲 Random character</button><button class="primary" id="startGame">Start life</button></div></div></div>`;
+ $("#startGame").onclick=()=>{const gender=$("#newGender").value;const name=$("#newName").value.trim()||`${pick(firstNames[gender])} ${pick(lastNames)}`;beginCharacter(gender,name,$("#newCountry").value)};
+ $("#randomCharacter").onclick=()=>{const gender=pick(Object.keys(firstNames));beginCharacter(gender,`${pick(firstNames[gender])} ${pick(lastNames)}`,pick(countries))};
+}
+function handleAction(action){
+ if(action==="age")return ageUp();if(action==="restart")return startScreen();
+ if(action==="journal"){game.happiness=clamp(game.happiness+4);addEvent("📝","You wrote in your journal.")}
+ else if(action==="exercise"){game.health=clamp(game.health+rand(4,9));game.happiness=clamp(game.happiness+2);addEvent("🏃","You exercised.","You feel healthier.")}
+ else if(action==="read"){if(!game.skills.reading)return toast("You need to learn to read first.");game.smarts=clamp(game.smarts+rand(3,7));addEvent("📚","You read a book.","Your smarts improved.")}
+ else if(action==="meditate"){game.happiness=clamp(game.happiness+rand(5,10));game.health=clamp(game.health+1);addEvent("🧘","You meditated.","You feel calmer.")}
+ else if(action==="art"){game.happiness=clamp(game.happiness+rand(3,8));game.smarts=clamp(game.smarts+1);addEvent("🎨","You took an art class.")}
+ else if(action==="party"){game.money-=100;game.happiness=clamp(game.happiness+rand(7,12));addEvent("🎉","You went out and had fun.","It cost $100.")}
+ else if(action==="doctor"){game.money-=500;game.health=clamp(game.health+rand(12,25));addEvent("🩺","You visited a doctor.","Your health improved.")}
+ else if(action==="volunteer"){game.happiness=clamp(game.happiness+5);addEvent("🤝","You volunteered in your community.")}
+ else if(action==="luck"){const r=rand(1,4);if(r===1){const n=rand(100,2000);game.money+=n;addEvent("🎲","You had a lucky day!",money(n))}else if(r===2){game.health=clamp(game.health-8);addEvent("🤕","A mishap spoiled your day.")}else{game.happiness=clamp(game.happiness+5);addEvent("✨","Something nice happened.")}}
+ else if(action==="college"||action==="university"){const uni=action==="university",cost=uni?8000:2000,years=uni?4:2;if(game.money<cost*years)return toast("Not enough money for tuition.");game.money-=cost*years;game.age+=years;game.year+=years;game.education+=years;game.school=uni?"University graduate":"College graduate";game.smarts=clamp(game.smarts+rand(5,12));addEvent("🎓",`You completed ${uni?"university":"community college"}.`,`${game.education} years of education.`)}
+ else if(action.startsWith("job:")){
+  if(game.job)return toast("Quit your current job before applying.");
+  const job=jobs[Number(action.split(":")[1])];
+  if(!job||game.age<job.education||game.education<job.education)return toast("You don't meet the job requirements.");
+  if(job.needsReading&&!game.skills.reading)return toast("You need to learn to read for this job.");
+  game.job={...job};game.income=job.furry?0:job.pay;
+  if(job.furry){game.happiness=100;if(game.partner)game.partner.quality=clamp(Math.round(game.partner.quality*.7));addEvent("🦊",`You became a ${job.title}.`,"You wear a full-body fox costume. This career is unpaid, keeps happiness maxed, and lowers relationship compatibility by 30%.")}
+  else addEvent("💼",`You got a job as a ${job.title}.`,`Salary: ${money(job.pay)}/year.`);
+ }
+ else if(action==="quit"){if(isFurryJob())return toast("You cannot quit a Furry special career.");const title=game.job?.title;game.job=null;game.income=0;addEvent("🚪",`You quit your job as a ${title}.`)}
+ else if(action==="date"){
+  if(game.age<16)return toast("You're too young to date.");
+  if(game.partner){game.partner.quality=clamp(game.partner.quality+rand(5,13));game.happiness=clamp(game.happiness+3);addEvent("💐",`You spent quality time with ${game.partner.name}.`)}
+  else{const g=pick(Object.keys(firstNames)),name=`${pick(firstNames[g])} ${pick(lastNames)}`;let quality=rand(55,85);if(isFurryJob())quality=Math.round(quality*.7);game.partner={name,status:"Dating",quality,age:game.age};game.happiness=clamp(game.happiness+5);addEvent("💌",`You started dating ${name}.`,isFurryJob()?"Furry career reduces initial compatibility by 30%.":"A new relationship begins.")}
+ }
+ else if(action==="propose"){if(!game.partner)return;if(game.age<18)return toast("You need to be an adult first.");if(game.partner.quality<35)return toast("Your relationship needs more care first.");game.partner.status="Married";game.partner.quality=clamp(game.partner.quality+10);addEvent("💍",`You married ${game.partner.name}!`)}
+ else if(action==="breakup"){if(!game.partner)return;const n=game.partner.name;game.partner=null;game.happiness=clamp(game.happiness-8);addEvent("💔",`You and ${n} split up.`)}
+ else if(action==="child"){if(game.age<18)return toast("You need to be an adult first.");if(!game.partner)return toast("You need to be in a relationship to have a child.");if(game.children.length>=6)return toast("You already have six children.");const g=pick(Object.keys(firstNames)),name=`${pick(firstNames[g])} ${pick(lastNames)}`;game.children.push({name,age:0});game.happiness=clamp(game.happiness+8);addEvent("👶",`You and ${game.partner.name} welcomed ${name} into your family.`)}
+ else if(action==="friend"){const g=pick(Object.keys(firstNames)),name=`${pick(firstNames[g])} ${pick(lastNames)}`;if(!game.friends.includes(name)){game.friends.push(name);game.happiness=clamp(game.happiness+3);addEvent("👋",`You made a new friend: ${name}.`)}}
+ else if(action.startsWith("house:")){const o=[["Cozy apartment",60000],["Small family home",180000],["Spacious house",420000],["Dream mansion",1200000]][Number(action.split(":")[1])];if(!o||game.money<o[1])return toast("Not enough money.");game.money-=o[1];game.house={name:o[0],price:o[1]};addEvent("🏠",`You bought a ${o[0]}.`,`Paid ${money(o[1])}.`)}
+ else if(action.startsWith("car:")){const o=[["Used hatchback",9000],["Family sedan",28000],["Electric car",65000],["Luxury sports car",180000]][Number(action.split(":")[1])];if(!o||game.money<o[1])return toast("Not enough money.");game.money-=o[1];game.car={name:o[0],price:o[1]};addEvent("🚗",`You bought a ${o[0]}.`,`Paid ${money(o[1])}.`)}
+ else if(action==="sellhouse"&&game.house){const v=Math.round(game.house.price*.75);game.money+=v;game.house=null;addEvent("🏠","You sold your home.",`Received ${money(v)}.`)}
+ else if(action==="sellcar"&&game.car){const v=Math.round(game.car.price*.65);game.money+=v;game.car=null;addEvent("🚗","You sold your vehicle.",`Received ${money(v)}.`)}
+ if(isFurryJob()){game.happiness=100;game.income=0}render();
+}
 
-  const jobs=[
-    {title:"Retail Associate",pay:24000,education:16,needsReading:false},
-    {title:"Cafe Worker",pay:26000,education:16,needsReading:false},
-    {title:"Furry",pay:0,education:16,needsReading:false,furry:true},
-    {title:"Furry Artist",pay:0,education:16,needsReading:false,furry:true},
-    {title:"Furry Suit Performer",pay:0,education:16,needsReading:false,furry:true},
-    {title:"Furry Community Host",pay:0,education:16,needsReading:false,furry:true},
-    {title:"Office Assistant",pay:33000,education:18,needsReading:true},
-    {title:"Lorry Driver",pay:46000,education:18,needsReading:false},
-    {title:"Teacher",pay:52000,education:21,needsReading:true},
-    {title:"Nurse",pay:68000,education:21,needsReading:true},
-    {title:"Banker",pay:72000,education:21,needsReading:true},
-    {title:"Software Developer",pay:90000,education:21,needsReading:true},
-    {title:"Engineer",pay:88000,education:21,needsReading:true},
-    {title:"Lawyer",pay:125000,education:24,needsReading:true},
-    {title:"Doctor",pay:155000,education:25,needsReading:true},
-    {title:"Chef",pay:48000,education:18,needsReading:false},
-    {title:"Artist",pay:38000,education:18,needsReading:false},
-    {title:"Athlete",pay:76000,education:18,needsReading:false},
-    {title:"Electrician",pay:62000,education:18,needsReading:false},
-    {title:"Plumber",pay:59000,education:18,needsReading:false},
-    {title:"Police Officer",pay:65000,education:21,needsReading:true},
-    {title:"Firefighter",pay:58000,education:18,needsReading:false},
-    {title:"Delivery Driver",pay:35000,education:18,needsReading:false},
-    {title:"Mechanic",pay:48000,education:18,needsReading:false},
-    {title:"Accountant",pay:68000,education:21,needsReading:true},
-    {title:"Farmer",pay:39000,education:16,needsReading:false},
-    {title:"Writer",pay:45000,education:18,needsReading:true}
-  ];
-
-  const lessonTopics=[
-    {id:"toilet",title:"Toilet training",age:3,skill:"toiletTrained",icon:"🚽",effort:1,
-      yes:"You practiced toilet training and learned to use the toilet.",
-      no:"You skipped toilet training and will not get this lesson again."},
-    {id:"reading",title:"Learn to read",age:5,skill:"reading",icon:"📖",effort:2,
-      yes:"You practiced reading and learned an important skill.",
-      no:"You chose not to learn to read. This lesson will not return."},
-    {id:"swimming",title:"Learn to swim",age:7,skill:"swimming",icon:"🏊",effort:2,
-      yes:"You practiced swimming and learned water safety.",
-      no:"You skipped swimming lessons."},
-    {id:"math",title:"Learn multiplication",age:8,skill:"math",icon:"➗",effort:2,
-      yes:"You practiced multiplication and learned your times tables.",
-      no:"You chose not to learn multiplication."},
-    {id:"manners",title:"Practice good manners",age:4,skill:"manners",icon:"🙂",effort:1,
-      yes:"You practiced being polite and considerate.",
-      no:"You skipped the manners lesson."},
-    {id:"tyingShoes",title:"Learn to tie your shoes",age:6,skill:"tyingShoes",icon:"👟",effort:1,
-      yes:"You practiced tying your shoes until you got it.",
-      no:"You skipped the shoe-tying lesson."},
-    {id:"cycling",title:"Learn to ride a bicycle",age:8,skill:"cycling",icon:"🚲",effort:2,
-      yes:"You practiced riding a bicycle and learned to balance.",
-      no:"You skipped bicycle lessons."},
-    {id:"cooking",title:"Learn basic cooking",age:12,skill:"cooking",icon:"🍳",effort:2,
-      yes:"You learned some basic cooking skills.",
-      no:"You skipped the cooking lesson."}
-  ];
-
-  const lessonLifeSkills=[
-    "First words","Walking","Sharing toys","Brushing teeth","Getting dressed",
-    "Following instructions","Recognizing letters","Counting to ten","Writing your name",
-    "Crossing streets safely","Making your bed","Keeping your room tidy","Using a computer",
-    "Typing","Telling time","Basic addition","Basic subtraction","Fractions",
-    "Reading maps","Using public transport","Making a simple budget","Saving money",
-    "Doing laundry","Washing dishes","Preparing a snack","Basic first aid",
-    "Teamwork","Listening carefully","Public speaking","Asking for help",
-    "Solving problems","Planning your day","Setting goals","Managing stress",
-    "Digital safety","Online privacy","Spotting scams","Respecting boundaries",
-    "Resolving disagreements","Apologizing","Making a phone call","Writing an email",
-    "Filling out a form","Job interview practice","Workplace teamwork","Time management",
-    "Cooking rice","Using kitchen safety","Understanding nutrition","Sleep habits",
-    "Stretching safely","Gardening","Plant care","Basic sewing","Simple repairs",
-    "Fire safety","Emergency contacts","Recycling","Caring for a pet","Road safety",
-    "Understanding emotions","Being a good friend","Making a study plan","Reading instructions"
-  ];
-
-  let lessons=lessonTopics.slice();
-  lessonLifeSkills.forEach((title,index)=>{
-    const age=4+Math.floor(index/3);
-    lessons.push({
-      id:"extraLesson"+index,title,age,skill:"extraLesson"+index,
-      icon:["🧠","📘","🛠️","🌟"][index%4],effort:index%3===0?1:2,
-      yes:`You practiced ${title.toLowerCase()} and learned a useful life skill.`,
-      no:`You chose to skip ${title.toLowerCase()}. This lesson will not return.`
-    });
-  });
-  lessons.sort((a,b)=>a.age-b.age);
-
-  const tabs=["Life","Activities","School & Work","Relationships","Assets","Lessons"];
-  let currentTab="Life";
-  let game=null;
-
-  function newGame(data={}) {
-    const gender=data.gender||pick(Object.keys(firstNames));
-    return {
-      name:data.name||`${pick(firstNames[gender])} ${pick(lastNames)}`,
-      gender,country:data.country||pick(countries),age:0,
-      health:90,happiness:75,smarts:rand(35,85),looks:rand(35,85),
-      money:0,income:0,education:0,school:"Toddler",job:null,
-      partner:null,children:[],friends:[],house:null,car:null,
-      alive:true,arrested:false,prisonYears:0,history:[],year:1,
-      skills:{},declinedLessons:[],lessonQueue:[],activeLesson:null,
-      diaper:false,relationshipsStarted:0,...data
-    };
-  }
-
-  function isFurryJob() { return !!game.job?.furry || !!game.job?.title?.startsWith("Furry"); }
-
-  function addEvent(icon,text,details="") {
-    game.history.unshift({icon,text,details,age:game.age});
-    game.history=game.history.slice(0,120);
-  }
-
-  function save(silent=false) {
-    if(!game)return;
-    try { localStorage.setItem(SAVE_KEY,JSON.stringify(game)); if(!silent)toast("Game saved."); }
-    catch { if(!silent)toast("Could not save in this browser."); }
-  }
-
-  function load() {
-    try {
-      const s=JSON.parse(localStorage.getItem(SAVE_KEY));
-      if(s&&typeof s.age==="number")return s;
-    } catch {}
-    return null;
-  }
-
-  function toast(message) {
-    $("#toast")?.remove();
-    const el=document.createElement("div");
-    el.id="toast"; el.textContent=message;
-    Object.assign(el.style,{
-      position:"fixed",bottom:"20px",left:"50%",transform:"translateX(-50%)",
-      background:"#243044",color:"white",padding:"11px 16px",borderRadius:"10px",zIndex:"10"
-    });
-    document.body.append(el);
-    setTimeout(()=>el.remove(),2300);
-  }
-
-  function money(n) {
-    return new Intl.NumberFormat(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
-  }
-
-  function characterEmoji() {
-    if(!game.alive)return "🪦";
-    if(game.age===0)return "👶";
-    if(game.age<3)return game.diaper?"👶":"🍼";
-    if(game.diaper)return "👶";
-    if(game.age<13)return "🧒";
-    if(game.age<18)return "🧑";
-    if(isFurryJob())return "🦊";
-    const title=game.job?.title||"";
-    if(["Banker","Lawyer","Office Assistant","Accountant"].includes(title))return "👔";
-    if(["Lorry Driver","Delivery Driver"].includes(title))return "🚚";
-    if(["Cafe Worker","Chef"].includes(title))return "👨‍🍳";
-    if(["Doctor","Nurse"].includes(title))return "🧑‍⚕️";
-    if(title==="Police Officer")return "👮";
-    if(["Artist","Writer"].includes(title))return "🧑‍🎨";
-    return game.gender==="Female"?"👩":game.gender==="Male"?"👨":"🧑";
-  }
-
-  function bar(label,value,color) {
-    return `<div class="meter"><div class="meter-label"><span>${label}</span><strong>${clamp(value)}%</strong></div>
-      <div class="track"><div class="fill ${color}" style="width:${clamp(value)}%"></div></div></div>`;
-  }
-
-  function renderProfile() {
-    if(isFurryJob())game.happiness=100;
-    const extras=[];
-    if(game.skills.reading)extras.push("Can read");
-    else if(game.age>=5)extras.push("Cannot read");
-    if(game.diaper)extras.push("Wearing a diaper");
-    $("#profile").innerHTML=`
-      <div class="name">${esc(game.name)}</div>
-      <div class="sub">${game.alive?`${game.age} years old`:`Died at age ${game.age}`} · ${esc(game.country)}</div>
-      <div class="sub">${esc(game.school||"No school")}</div>
-      <div class="portrait" title="Your character"><div class="avatar">${characterEmoji()}</div></div>
-      <div class="sub">${isFurryJob()?"🦊 Fox costume":game.job?esc(game.job.title):game.age===0?"Baby":game.diaper?"Wearing a diaper":"Your character"}</div>
-      ${extras.length?`<div class="sub">${extras.join(" · ")}</div>`:""}
-      <div class="section-title">Your stats <span class="pill">${game.alive?"Alive":"Life complete"}</span></div>
-      ${bar("Health",game.health,"green")}
-      ${bar("Happiness",game.happiness,"orange")}
-      ${bar("Smarts",game.smarts,"blue")}
-      ${bar("Looks",game.looks,"pink")}
-      <div class="money"><div><div class="sub">Bank balance</div><strong>${money(game.money)}</strong></div><span>💵</span></div>
-      <div class="sub" style="margin-top:10px">Yearly income: ${money(game.income||0)}</div>
-      ${game.partner?`<div class="sub" style="margin-top:7px">❤️ Partner: ${esc(game.partner.name)}</div>`:""}
-      ${isFurryJob()?`<div class="notice">Furry career: unpaid, happiness stays maxed, and each relationship has a 60% breakup chance per year.</div>`:""}
-      ${game.arrested?`<div class="notice">🚔 In prison: ${game.prisonYears} year(s) left.</div>`:""}`;
-  }
-
-  function renderTabs() {
-    $("#tabs").innerHTML=tabs.map(t=>`<button class="tab ${currentTab===t?"active":""}" data-tab="${t}">${t}</button>`).join("");
-    $("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;render();});
-  }
-
-  function actionButton(title,description,action,disabled=false) {
-    return `<button class="action" data-action="${action}" ${disabled?"disabled":""}>${title}<span>${description}</span></button>`;
-  }
-
-  function renderLife() {
-    return `<div class="section-title">Life events <span class="sub">Year ${game.year}</span></div>
-      ${!game.alive?`<div class="notice"><strong>Your story has ended.</strong><br>You lived to ${game.age} and earned ${money(game.money)}.</div>
-        <button class="primary" data-action="restart">Begin a new life</button>`:
-        `<div class="actions" style="margin-bottom:18px">
-          ${actionButton("🎂 Age up","Live through another year","age")}
-          ${actionButton("📝 Write a journal","Reflect and feel better","journal",game.age<6)}
-        </div>`}
-      <div class="feed">${game.history.length?game.history.slice(0,18).map(e=>`
-        <div class="event"><div class="event-icon">${e.icon}</div><div><strong>${esc(e.text)}</strong>
-        <small>Age ${e.age}${e.details?" · "+esc(e.details):""}</small></div></div>`).join(""):`<div class="empty">Your story starts here. Age up to see what happens!</div>`}</div>`;
-  }
-
-  function renderActivities() {
-    return `<div class="section-title">Activities</div><div class="actions">
-      ${actionButton("🏃 Exercise","Improve health","exercise",game.age<6)}
-      ${actionButton("📚 Read a book","Boost smarts","read",game.age<4||!game.skills.reading)}
-      ${actionButton("🧘 Meditate","Improve happiness","meditate",game.age<8)}
-      ${actionButton("🎨 Take an art class","Have fun and learn","art",game.age<8)}
-      ${actionButton("🎉 Go out","Costs $100","party",game.age<16||game.money<100)}
-      ${actionButton("🩺 Visit a doctor","Health check · costs $500","doctor",game.money<500)}
-      ${actionButton("🤝 Volunteer","Help your community","volunteer",game.age<16)}
-      ${actionButton("🎲 Try your luck","Random outcome","luck",game.age<18)}
-    </div><div class="notice">Age up to experience yearly events and lessons.</div>`;
-  }
-
-  function renderSchoolWork() {
-    let available=jobs.filter(j=>game.age>=j.education&&game.education>=j.education);
-    if(!game.skills.reading)available=available.filter(j=>!j.needsReading);
-    return `<div class="section-title">School & work</div>
-      <div class="notice"><strong>Education:</strong> ${game.education?`${game.education} years completed`:"No qualifications"}
-        · <strong>Status:</strong> ${esc(game.school)}</div>
-      ${game.job?`<div class="list-row"><div><strong>${esc(game.job.title)}</strong>
-        <div class="sub">${isFurryJob()?"Unpaid special career":money(game.income)+"/year"}</div></div>
-        ${!isFurryJob()?`<button class="danger small" data-action="quit">Quit job</button>`:""}
-        </div>`:`
-        <div class="section-title">Available jobs</div>
-        <div class="list">${available.length?available.map(j=>`
-          <div class="list-row"><div><strong>${esc(j.title)}</strong>
-            <div class="sub">${j.furry?"Unpaid special career":money(j.pay)+"/year"} · age ${j.education}+</div></div>
-            <button class="primary small" data-action="job:${jobs.indexOf(j)}">Apply</button></div>`).join(""):`<div class="empty">No jobs available. Lessons can unlock more options.</div>`}
-        </div>`}
-      ${game.age>=18&&!game.job&&game.education<24?`<div class="section-title">Higher education</div><div class="actions">
-        ${actionButton("🎓 Community college","2 years · $2,000/year","college")}
-        ${actionButton("🏛️ University","4 years · $8,000/year","university")}
-      </div>`:""}
-      <p class="sub">Not learning to read blocks jobs that require reading.</p>`;
-  }
-
-  function renderRelationships() {
-    return `<div class="section-title">Relationships <span class="sub">${game.children.length} child(ren)</span></div>
-      ${game.partner?`<div class="list-row"><div><strong>💞 ${esc(game.partner.name)}</strong>
-        <div class="sub">${esc(game.partner.status)} · relationship ${game.partner.quality}%</div></div>
-        <div class="row-buttons"><button class="secondary small" data-action="date">Go on a date</button>
-        <button class="secondary small" data-action="propose">Propose</button>
-        <button class="danger small" data-action="breakup">Break up</button></div></div>`:
-        `<div class="notice">You are single.${isFurryJob()?" Furry careers have a 60% yearly breakup chance.":""}</div>
-        <button class="primary" data-action="date" ${game.age<16?"disabled":""}>💌 Meet someone</button>`}
-      ${game.age>=18&&game.partner&&game.children.length<6?`<button class="secondary" style="margin:10px 0" data-action="child">👶 Have a child with your partner</button>`:""}
-      <div class="section-title">Children</div>
-      ${game.children.length?`<div class="list">${game.children.map(c=>`<div class="list-row"><strong>🧒 ${esc(c.name)}</strong><span class="pill">Age ${c.age}</span></div>`).join("")}</div>`:`<div class="empty">No children yet.</div>`}
-      <div class="section-title">Friends</div><div class="sub">${game.friends.length?game.friends.map(esc).join(", "):"You have not made any friends yet."}</div>
-      <button class="secondary" style="margin-top:10px" data-action="friend">👋 Make a friend</button>`;
-  }
-
-  function renderAssets() {
-    const houses=[["Cozy apartment",60000],["Small family home",180000],["Spacious house",420000],["Dream mansion",1200000]];
-    const cars=[["Used hatchback",9000],["Family sedan",28000],["Electric car",65000],["Luxury sports car",180000]];
-    const makeShop=(items,type,owned)=>owned?
-      `<div class="list-row"><strong>${type==="house"?"🏠":"🚗"} ${esc(owned.name)}</strong><button class="secondary small" data-action="sell${type}">Sell</button></div>`:
-      `<div class="list">${items.map(([name,price],i)=>`<div class="list-row"><div><strong>${type==="house"?"🏠":"🚗"} ${name}</strong><div class="sub">${money(price)}</div></div>
-        <button class="primary small" data-action="${type}:${i}" ${game.money<price?"disabled":""}>Buy</button></div>`).join("")}</div>`;
-    return `<div class="section-title">Assets</div><div class="section-title">Home</div>${makeShop(houses,"house",game.house)}
-      <div class="section-title">Vehicle</div>${makeShop(cars,"car",game.car)}`;
-  }
-
-  function renderLessons() {
-    const completed=Object.values(game.skills).filter(Boolean).length;
-    const skipped=game.declinedLessons.length;
-    return `<div class="section-title">Lessons <span class="pill">${completed} learned · ${skipped} skipped</span></div>
-      <div class="notice">Lessons appear as you grow up. Choose Yes to practice and learn, or No to permanently skip that lesson. Some lessons unlock careers and activities.</div>
-      <div class="list">${lessons.map(l=>{
-        const learned=!!game.skills[l.skill],declined=game.declinedLessons.includes(l.id);
-        const status=learned?"✅ Learned":declined?"⛔ Skipped":game.age<l.age?"🔒 Age "+l.age:"⌛ Upcoming";
-        return `<div class="list-row"><div><strong>${l.icon} ${esc(l.title)}</strong><div class="sub">${status} · effort ${l.effort}/3</div></div></div>`;
-      }).join("")}</div>`;
-  }
-
-  function render() {
-    if(!game)return;
-    game.skills ||= {};
-    game.declinedLessons ||= [];
-    game.lessonQueue ||= [];
-    if(isFurryJob()){game.happiness=100;game.income=0;}
-    renderProfile();renderTabs();
-    const views={"Life":renderLife,"Activities":renderActivities,"School & Work":renderSchoolWork,
-      "Relationships":renderRelationships,"Assets":renderAssets,"Lessons":renderLessons};
-    $("#content").innerHTML=views[currentTab]();
-    $("#content").querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>handleAction(b.dataset.action));
-    save(true);
-  }
-
-  function pendingLessonForCurrentAge() {
-    return lessons.find(l=>l.age===game.age&&!game.skills[l.skill]&&!game.declinedLessons.includes(l.id));
-  }
-
-  function showLesson(lesson) {
-    let progress=0;
-    const renderModal=()=> {
-      $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal">
-        <h2>${lesson.icon} Lesson: ${esc(lesson.title)}</h2>
-        <p>Would you like to practice? Learning takes effort and time. Choose No to skip this lesson permanently.</p>
-        <p class="sub">Practice progress: ${progress}/${lesson.effort}</p>
-        <div class="lesson-progress"><div style="width:${Math.round(progress/lesson.effort*100)}%"></div></div>
-        <div class="modal-actions">
-          <button class="danger" id="skipLesson">No — skip forever</button>
-          <button class="secondary" id="practiceLesson">${progress?"Keep practicing":"Yes — practice"}</button>
-        </div>
-      </div></div>`;
-      $("#skipLesson").onclick=()=>{
-        game.declinedLessons.push(lesson.id);
-        if(lesson.id==="toilet")game.diaper=true;
-        addEvent(lesson.icon,lesson.no,lesson.id==="toilet"?"You may continue wearing diapers.":"This lesson will not return.");
-        $("#modalRoot").innerHTML="";
-        render();
-        offerNextLesson();
-      };
-      $("#practiceLesson").onclick=()=>{
-        progress++;
-        game.happiness=clamp(game.happiness-1);
-        if(progress<lesson.effort){renderModal();return;}
-        game.skills[lesson.skill]=true;
-        if(lesson.id==="toilet")game.diaper=false;
-        game.smarts=clamp(game.smarts+1);
-        addEvent(lesson.icon,lesson.yes,"You spent time and effort practicing.");
-        $("#modalRoot").innerHTML="";
-        render();
-        offerNextLesson();
-      };
-    };
-    renderModal();
-  }
-
-  function offerNextLesson() {
-    const next=game.lessonQueue.shift();
-    if(next)setTimeout(()=>showLesson(next),150);
-  }
-
-  function randomLifeEvent() {
-    const events=[];
-    if(game.age>=1&&game.age<=12) {
-      events.push(
-        ()=>{game.smarts=clamp(game.smarts+rand(1,4));addEvent("📖","You learned something at school.","Your smarts improved.");},
-        ()=>{game.happiness=clamp(game.happiness+rand(2,7));addEvent("🧸","You had a fun day with your family.");},
-        ()=>{game.health=clamp(game.health-rand(1,5));addEvent("🤧","You caught a small cold.","You rested and recovered.");}
-      );
-    }
-    if(game.age>=6)events.push(()=>addEvent("🩺","You had a routine health check.","Everything looks okay."));
-    if(game.age>=7&&game.age<=18)events.push(
-      ()=>{game.smarts=clamp(game.smarts+rand(1,4));addEvent("📝","You did well on a school assignment.");},
-      ()=>{game.happiness=clamp(game.happiness-rand(1,5));addEvent("📚","School felt challenging this year.");}
-    );
-    if(game.age>=10)events.push(()=>addEvent("👁️","You had an eye test.","Your eyes are doing well."));
-    if(game.job&&!isFurryJob())events.push(
-      ()=>{const bonus=rand(100,1500);game.money+=bonus;addEvent("🎁","You received a work bonus.",money(bonus));},
-      ()=>{game.happiness=clamp(game.happiness-rand(1,5));addEvent("😓","Work was stressful this year.");}
-    );
-    if(game.partner)events.push(()=>{
-      game.partner.quality=clamp(game.partner.quality+rand(1,7));
-      addEvent("❤️",`You shared a nice moment with ${game.partner.name}.`);
-    });
-    events.push(
-      ()=>{const amount=rand(50,500);game.money+=amount;addEvent("🎁","A relative gave you some money.",money(amount));},
-      ()=>{game.happiness=clamp(game.happiness+rand(1,5));addEvent("☀️","You had a surprisingly good day.");},
-      ()=>{game.health=clamp(game.health-rand(1,5));addEvent("🤕","You had a minor accident.","Thankfully, it was not serious.");}
-    );
-    pick(events)();
-  }
-
-  function ageUp() {
-    if(!game.alive)return;
-    game.age++;game.year++;
-    game.health=clamp(game.health-(game.age>65?rand(2,7):rand(0,2)));
-    if(!isFurryJob())game.happiness=clamp(game.happiness-rand(0,2));
-    else game.happiness=100;
-
-    if(game.age===4){game.school="Preschool";addEvent("🧸","You started preschool.");}
-    if(game.age===6){game.school="Primary School";addEvent("🏫","You started primary school.");}
-    if(game.age===13){game.school="Secondary School";addEvent("📚","You started secondary school.");}
-    if(game.age===18){game.school="Graduated";game.education=Math.max(game.education,18);addEvent("🎓","You graduated from secondary school.","You can apply for adult jobs.");}
-
-    const newLessons=lessons.filter(l=>l.age===game.age&&!game.skills[l.skill]&&!game.declinedLessons.includes(l.id));
-    game.lessonQueue.push(...newLessons);
-
-    if(game.job) {
-      if(!isFurryJob()) {
-        const pay=Math.round(game.income*(game.house?.78:.88));
-        game.money+=pay;
-        if(game.house)game.money-=9000;
-        if(game.car)game.money-=2400;
-        addEvent("💼","You worked another year.",`Earned ${money(pay)} after tax and expenses.`);
-        if(Math.random()<.06){game.income=Math.round(game.income*1.08);game.job.pay=game.income;addEvent("⭐","You got a raise!",`New salary: ${money(game.income)}/year`);}
-      } else {
-        game.income=0;
-        addEvent("🦊","You spent another year in your furry career.","This special career is unpaid.");
-      }
-    }
-
-    if(game.arrested) {
-      game.prisonYears--;game.happiness=clamp(game.happiness-10);
-      if(game.prisonYears<=0){game.arrested=false;addEvent("🔓","You were released from prison.");}
-      else addEvent("🚔","You spent another year in prison.",`${game.prisonYears} year(s) left.`);
-    }
-
-    game.children.forEach(c=>c.age++);
-    randomLifeEvent();
-
-    if(game.partner) {
-      if(isFurryJob()&&Math.random()<0.60) {
-        const name=game.partner.name;game.partner=null;
-        addEvent("💔",`You and ${name} broke up.`,"Your furry career gave this relationship a 60% yearly breakup chance.");
-      } else if(!isFurryJob()&&game.partner.quality<=5&&Math.random()<.35) {
-        const name=game.partner.name;game.partner=null;
-        addEvent("💔",`You and ${name} broke up.`,"The relationship had been struggling.");
-      }
-    }
-
-    if(game.health<=0||(game.age>60&&Math.random()<Math.min(.04+(game.age-60)*.012,.55))) {
-      game.alive=false;game.health=Math.max(0,game.health);
-      addEvent("🕊️","Your life came to an end.",`You lived to age ${game.age}.`);
-    }
-    if(isFurryJob())game.happiness=100;
-    render();
-
-    if(game.lessonQueue.length) {
-      const first=game.lessonQueue.shift();
-      showLesson(first);
-    }
-    if(game.alive)toast(`You are now ${game.age}.`);
-  }
-
-  function modal(title,body,onConfirm,confirmLabel="Confirm") {
-    $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal"><h2>${title}</h2><div>${body}</div>
-      <div class="modal-actions"><button class="secondary" id="cancelModal">Cancel</button><button class="primary" id="confirmModal">${confirmLabel}</button></div></div></div>`;
-    $("#cancelModal").onclick=()=>$("#modalRoot").innerHTML="";
-    $("#confirmModal").onclick=()=>{$("#modalRoot").innerHTML="";onConfirm();};
-    $("#modalRoot").querySelector(".modal-backdrop").onclick=e=>{if(e.target.classList.contains("modal-backdrop"))$("#modalRoot").innerHTML="";};
-  }
-
-  function beginCharacter(gender,name,country) {
-    game=newGame({gender,name,country});
-    addEvent("👶",`You were born in ${game.country}.`,"A brand-new life begins.");
-    $("#modalRoot").innerHTML="";
-    currentTab="Life";render();
-  }
-
-  function startScreen() {
-    $("#modalRoot").innerHTML=`<div class="modal-backdrop"><div class="modal">
-      <h2>Start a new life 🌱</h2>
-      <p>Create a character or use the random button.</p>
-      <div class="form-row">
-        <label>Name<input id="newName" maxlength="32" placeholder="Leave blank for a random name"></label>
-        <label>Character<select id="newGender"><option>Female</option><option>Male</option><option>Nonbinary</option></select></label>
-      </div>
-      <label>Country<select id="newCountry">${countries.map(c=>`<option>${c}</option>`).join("")}</select></label>
-      <div class="modal-actions">
-        <button class="secondary" id="randomCharacter">🎲 Random character</button>
-        <button class="primary" id="startGame">Start life</button>
-      </div></div></div>`;
-
-    $("#startGame").onclick=()=>{
-      const gender=$("#newGender").value;
-      const name=$("#newName").value.trim()||`${pick(firstNames[gender])} ${pick(lastNames)}`;
-      beginCharacter(gender,name,$("#newCountry").value);
-    };
-    $("#randomCharacter").onclick=()=>{
-      const gender=pick(Object.keys(firstNames));
-      beginCharacter(gender,`${pick(firstNames[gender])} ${pick(lastNames)}`,pick(countries));
-    };
-  }
-
-  function handleAction(action) {
-    if(action==="age")return ageUp();
-    if(action==="restart")return startScreen();
-
-    if(action==="journal"){game.happiness=clamp(game.happiness+4);addEvent("📝","You wrote in your journal.");}
-    else if(action==="exercise"){game.health=clamp(game.health+rand(4,9));game.happiness=clamp(game.happiness+2);addEvent("🏃","You exercised.","You feel healthier.");}
-    else if(action==="read"){
-      if(!game.skills.reading)return toast("You need to learn to read first.");
-      game.smarts=clamp(game.smarts+rand(3,7));addEvent("📚","You read a book.","Your smarts improved.");
-    }
-    else if(action==="meditate"){game.happiness=clamp(game.happiness+rand(5,10));game.health=clamp(game.health+1);addEvent("🧘","You meditated.","You feel calmer.");}
-    else if(action==="art"){game.happiness=clamp(game.happiness+rand(3,8));game.smarts=clamp(game.smarts+1);addEvent("🎨","You took an art class.");}
-    else if(action==="party"){game.money-=100;game.happiness=clamp(game.happiness+rand(7,12));addEvent("🎉","You went out and had fun.","It cost $100.");}
-    else if(action==="doctor"){game.money-=500;game.health=clamp(game.health+rand(12,25));addEvent("🩺","You visited a doctor.","Your health improved.");}
-    else if(action==="volunteer"){game.happiness=clamp(game.happiness+5);addEvent("🤝","You volunteered in your community.");}
-    else if(action==="luck"){
-      const r=rand(1,4);
-      if(r===1){const n=rand(100,2000);game.money+=n;addEvent("🎲","You had a lucky day!",money(n));}
-      else if(r===2){game.health=clamp(game.health-8);addEvent("🤕","A mishap spoiled your day.");}
-      else{game.happiness=clamp(game.happiness+5);addEvent("✨","Something nice happened.");}
-    }
-    else if(action==="college"||action==="university"){
-      const uni=action==="university",cost=uni?8000:2000,years=uni?4:2;
-      if(game.money<cost*years)return toast("Not enough money for tuition.");
-      game.money-=cost*years;game.age+=years;game.year+=years;game.education+=years;
-      game.school=uni?"University graduate":"College graduate";
-      game.smarts=clamp(game.smarts+rand(5,12));
-      addEvent("🎓",`You completed ${uni?"university":"community college"}.`,`${game.education} years of education.`);
-    }
-    else if(action.startsWith("job:")){
-      if(game.job)return toast("Quit your current job before applying.");
-      const job=jobs[Number(action.split(":")[1])];
-      if(!job||game.age<job.education||game.education<job.education)return toast("You don't meet the job requirements.");
-      if(job.needsReading&&!game.skills.reading)return toast("You need to learn to read for this job.");
-      game.job={...job};game.income=job.furry?0:job.pay;
-      if(job.furry) {
-        game.happiness=100;
-        if(game.partner)game.partner.quality=clamp(Math.round(game.partner.quality*.7));
-        addEvent("🦊",`You became a ${job.title}.`,"You wear a fox costume. This career is unpaid, keeps happiness maxed, and lowers relationship compatibility by 30%.");
-      } else addEvent("💼",`You got a job as a ${job.title}.`,`Salary: ${money(job.pay)}/year.`);
-    }
-    else if(action==="quit"){
-      if(isFurryJob())return toast("You cannot quit a Furry special career.");
-      const title=game.job?.title;game.job=null;game.income=0;addEvent("🚪",`You quit your job as a ${title}.`);
-    }
-    else if(action==="date"){
-      if(game.age<16)return toast("You're too young to date.");
-      if(game.partner){
-        game.partner.quality=clamp(game.partner.quality+rand(5,13));
-        game.happiness=clamp(game.happiness+3);
-        addEvent("💐",`You spent quality time with ${game.partner.name}.`);
-      } else {
-        const gender=pick(Object.keys(firstNames));
-        const name=`${pick(firstNames[gender])} ${pick(lastNames)}`;
-        let quality=rand(55,85);
-        if(isFurryJob())quality=Math.round(quality*.7);
-        game.partner={name,status:"Dating",quality,age:game.age};
-        game.relationshipsStarted++;
-        game.happiness=clamp(game.happiness+5);
-        addEvent("💌",`You started dating ${name}.`,isFurryJob()?"Furry career reduces initial compatibility by 30%.":"A new relationship begins.");
-      }
-    }
-    else if(action==="propose"){
-      if(!game.partner)return;
-      if(game.age<18)return toast("You need to be an adult first.");
-      if(game.partner.quality<35)return toast("Your relationship needs more care first.");
-      game.partner.status="Married";game.partner.quality=clamp(game.partner.quality+10);
-      addEvent("💍",`You married ${game.partner.name}!`);
-    }
-    else if(action==="breakup"){
-      if(!game.partner)return;
-      const name=game.partner.name;game.partner=null;game.happiness=clamp(game.happiness-8);addEvent("💔",`You and ${name} split up.`);
-    }
-    else if(action==="child"){
-      if(game.age<18)return toast("You need to be an adult first.");
-      if(!game.partner)return toast("You need to be in a relationship to have a child.");
-      if(game.children.length>=6)return toast("You already have six children.");
-      const gender=pick(Object.keys(firstNames)),name=`${pick(firstNames[gender])} ${pick(lastNames)}`;
-      game.children.push({name,age:0});game.happiness=clamp(game.happiness+8);
-      addEvent("👶",`You and ${game.partner.name} welcomed ${name} into your family.`);
-    }
-    else if(action==="friend"){
-      const gender=pick(Object.keys(firstNames)),name=`${pick(firstNames[gender])} ${pick(lastNames)}`;
-      if(!game.friends.includes(name)){game.friends.push(name);game.happiness=clamp(game.happiness+3);addEvent("👋",`You made a new friend: ${name}.`);}
-    }
-    else if(action.startsWith("house:")){
-      const options=[["Cozy apartment",60000],["Small family home",180000],["Spacious house",420000],["Dream mansion",1200000]];
-      const [name,price]=options[Number(action.split(":")[1])];
-      if(game.money<price)return toast("Not enough money.");
-      game.money-=price;game.house={name,price};addEvent("🏠",`You bought a ${name}.`,`Paid ${money(price)}.`);
-    }
-    else if(action.startsWith("car:")){
-      const options=[["Used hatchback",9000],["Family sedan",28000],["Electric car",65000],["Luxury sports car",180000]];
-      const [name,price]=options[Number(action.split(":")[1])];
-      if(game.money<price)return toast("Not enough money.");
-      game.money-=price;game.car={name,price};addEvent("🚗",`You bought a ${name}.`,`Paid ${money(price)}.`);
-    }
-    else if(action==="sellhouse"&&game.house){const value=Math.round(game.house.price*.75);game.money+=value;game.house=null;addEvent("🏠","You sold your home.",`Received ${money(value)}.`);}
-    else if(action==="sellcar"&&game.car){const value=Math.round(game.car.price*.65);game.money+=value;game.car=null;addEvent("🚗","You sold your vehicle.",`Received ${money(value)}.`);}
-
-    if(isFurryJob()){game.happiness=100;game.income=0;}
-    render();
-  }
-
-  $("#saveBtn").onclick=()=>save();
-  $("#newBtn").onclick=()=>modal("Start over?","This replaces the life saved in this browser.",
-    ()=>{localStorage.removeItem(SAVE_KEY);startScreen();},"Start over");
-
-  game=load();
-  if(game) {
-    game.friends||=[];game.children||=[];game.history||=[];
-    game.skills||={};game.declinedLessons||=[];game.lessonQueue||=[];
-    if(game.job?.title?.startsWith("Furry")) {
-      game.job.furry=true;game.income=0;game.happiness=100;
-    }
-    render();
-  } else startScreen();
+$("#saveBtn").onclick=()=>save();
+$("#newBtn").onclick=()=>modal("Start over?","This replaces the life saved in this browser.",()=>{localStorage.removeItem(SAVE_KEY);startScreen()},"Start over");
+game=load();
+if(game){
+ game.friends||=[];game.children||=[];game.history||=[];game.skills||={};game.declinedLessons||=[];game.lessonQueue||=[];
+ if(game.age<3&&!game.skills.toiletTrained)game.diaper=true;
+ if(game.skills.toiletTrained)game.diaper=false;
+ if(game.job?.title?.startsWith("Furry")){game.job.furry=true;game.income=0;game.happiness=100}
+ render();
+}else startScreen();
 })();
 </script>
 </body>
